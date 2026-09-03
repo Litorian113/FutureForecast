@@ -1,6 +1,6 @@
 <div align="center">
 
-# Future Lab
+# FutureForecast
 
 **Three experiments with a time-series foundation model.**
 Earthquakes, electricity demand and weather, each compared with the method people normally use.

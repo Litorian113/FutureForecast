@@ -1,6 +1,6 @@
 <div align="center">
 
-# Future Lab · FutureWeather
+# FutureForecast · Weather details
 
 **Sieben Tage Wetter aus der Historie allein.**
 TimesFM 3.0 zero-shot gegen Persistenz, Klimatologie und ein echtes Wettermodell,
