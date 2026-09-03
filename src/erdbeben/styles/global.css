@@ -1857,3 +1857,47 @@ select {
 .globePanel .facts dd {
   font-size: 10.5px;
 }
+
+/* ==================== globe panel v2: section chooser as wrapping pills ==================== */
+.globePanel .tabs {
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow: visible;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.globePanel .tab {
+  padding: 6px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 11.5px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.globePanel .tab:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text);
+}
+
+.globePanel .tab.on {
+  background: rgba(61, 220, 132, 0.14);
+  border-color: rgba(61, 220, 132, 0.6);
+  color: #d9ffe9;
+}
+
+.globePanel .tab .n {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  opacity: 1;
+}
+
+.globePanel .tab.on .n {
+  background: rgba(61, 220, 132, 0.25);
+  color: #d9ffe9;
+}
