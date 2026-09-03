@@ -15,9 +15,12 @@ const CAMERA_Z = 12;
 const CAMERA_FOV = 75;
 const GLOBE_POINT_SIZE = 0.015;
 const GLOBE_COLOR = 0x6e6d95;
+// continents: a dark, cool slate so the land reads as a plate against the night ocean and the
+// warm quake dots stay the brightest thing on the globe
+const CONTINENT_COLOR = 0x2a2f4a;
 // Continent overlay: the equirectangular map baked into a texture on a sphere just below the
 // point cloud, tinted in the globe colour, front side only.
-const CONTINENT_OPACITY = 0.75;
+const CONTINENT_OPACITY = 0.9;
 const CONTINENT_TEXTURE_WIDTH = 2880;
 /** predicted dots: size by magnitude class, colour by magnitude (dark → light green) */
 const FORECAST_SIZE: Record<Level, number> = { low: 0.02, medium: 0.03, high: 0.045 };
@@ -343,7 +346,7 @@ export default function Globe() {
     // the latLonToVector3 convention above.
     let disposed = false;
     const continentMaterial = new THREE.MeshBasicMaterial({
-      color: GLOBE_COLOR,
+      color: CONTINENT_COLOR,
       transparent: true,
       opacity: CONTINENT_OPACITY,
       depthWrite: false,
