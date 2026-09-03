@@ -1724,3 +1724,136 @@ select {
   color: var(--muted);
   white-space: nowrap;
 }
+
+/* ==================== globe panel v2: detail card ==================== */
+.globePanel .detail {
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.globePanel .detailNav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.globePanel .navBtn {
+  width: 34px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.globePanel .navBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.globePanel .navPos {
+  min-width: 52px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.globePanel .navPos b {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.globePanel .navSpacer {
+  flex: 1;
+}
+
+.globePanel .detailTitle {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  overflow: visible;
+}
+
+.globePanel .statRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.globePanel .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.globePanel .stat b {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--forecast);
+  font-variant-numeric: tabular-nums;
+}
+
+.globePanel .stat span {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.globePanel .pairLines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.globePanel .pairLines > div {
+  display: grid;
+  grid-template-columns: 12px 62px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.globePanel .pairLines .k {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 9.5px;
+}
+
+.globePanel .pairLines .v {
+  color: var(--text);
+}
+
+.globePanel .pairLines .ring {
+  width: 8px;
+  height: 8px;
+  align-self: center;
+}
+
+.globePanel .pairLines .ring.none {
+  visibility: hidden;
+}
+
+.globePanel .facts dt {
+  font-size: 10px;
+}
+
+.globePanel .facts dd {
+  font-size: 10.5px;
+}

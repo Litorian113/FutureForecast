@@ -713,41 +713,79 @@ export default function Globe() {
 
           {selectedItem && currentSection && (
             <div className="detail" aria-live="polite">
-              <div className="detailHead">
-                <span className="detailTitle">{selectedItem.place}</span>
-                <span className="stepper">
-                  <button type="button" className="ghostBtn" onClick={() => step(-1)} aria-label="Previous">
-                    ‹
-                  </button>
-                  <span>
-                    {selectedIdx + 1} / {currentSection.items.length}
-                  </span>
-                  <button type="button" className="ghostBtn" onClick={() => step(1)} aria-label="Next">
-                    ›
-                  </button>
-                  <button type="button" className="ghostBtn" onClick={clearSelection} aria-label="Clear selection">
-                    ×
-                  </button>
+              <div className="detailNav">
+                <button type="button" className="navBtn" onClick={() => step(-1)} aria-label="Previous">
+                  ‹
+                </button>
+                <span className="navPos">
+                  <b>{selectedIdx + 1}</b> / {currentSection.items.length}
                 </span>
+                <button type="button" className="navBtn" onClick={() => step(1)} aria-label="Next">
+                  ›
+                </button>
+                <span className="navSpacer" />
+                <button type="button" className="iconBtn" onClick={clearSelection} aria-label="Clear selection" title="Clear selection">
+                  ×
+                </button>
               </div>
-              {selectedItem.pair && (
-                <div className="pairLegend">
-                  <span>
-                    <span className="ring white" /> real quake
-                  </span>
-                  <span>
-                    <span className="ring green" /> predicted dot
-                  </span>
-                </div>
-              )}
-              <dl className="facts">
-                {selectedItem.facts.map((f) => (
-                  <div key={f.label}>
-                    <dt>{f.label}</dt>
-                    <dd>{f.value}</dd>
+              <div className="detailTitle">{selectedItem.place}</div>
+              {selectedItem.pair ? (
+                <>
+                  <div className="statRow">
+                    <div className="stat">
+                      <b>{Math.round(selectedItem.pair.km)} km</b>
+                      <span>apart</span>
+                    </div>
+                    <div className="stat">
+                      <b>
+                        {selectedItem.pair.sameMonth
+                          ? 'same'
+                          : Math.abs(selectedItem.pair.daysApart) >= 45
+                            ? `${Math.round(Math.abs(selectedItem.pair.daysApart) / 30)} mo`
+                            : `${Math.abs(selectedItem.pair.daysApart)} d`}
+                      </b>
+                      <span>{selectedItem.pair.sameMonth ? 'month' : selectedItem.pair.daysApart < 0 ? 'early' : 'late'}</span>
+                    </div>
+                    <div className="stat">
+                      <b>
+                        {selectedItem.pair.realMag - selectedItem.pair.predMag >= 0 ? '+' : '−'}
+                        {Math.abs(selectedItem.pair.realMag - selectedItem.pair.predMag).toFixed(1)}
+                      </b>
+                      <span>magnitude</span>
+                    </div>
                   </div>
-                ))}
-              </dl>
+                  <div className="pairLines">
+                    <div>
+                      <span className="ring white" />
+                      <span className="k">real</span>
+                      <span className="v">{selectedItem.facts[0]?.value}</span>
+                    </div>
+                    <div>
+                      <span className="ring green" />
+                      <span className="k">predicted</span>
+                      <span className="v">{selectedItem.facts[1]?.value}</span>
+                    </div>
+                    {selectedItem.facts
+                      .filter((f) => /region/i.test(f.label))
+                      .map((f) => (
+                        <div key={f.label}>
+                          <span className="ring none" />
+                          <span className="k">region</span>
+                          <span className="v">{f.value}</span>
+                        </div>
+                      ))}
+                  </div>
+                </>
+              ) : (
+                <dl className="facts">
+                  {selectedItem.facts.map((f) => (
+                    <div key={f.label}>
+                      <dt>{f.label}</dt>
+                      <dd>{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </div>
           )}
 
