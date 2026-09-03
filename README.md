@@ -2,244 +2,240 @@
 
 # Future Lab
 
-**Kann ein KI-Modell die Zukunft aus der Vergangenheit lesen?**
-Ein Modell, drei Gegenstände, drei ehrliche Antworten.
+**Can an AI model read the future from the past?**
+One model, three subjects, three honest answers.
 
-Erdbeben · Strom · Wetter — jeweils gemessen gegen das, was dort Standard ist.
+Earthquakes · Electricity · Weather, each measured against whatever is the standard there.
 
-[Startseite](#die-seite) · [Wie es funktioniert](#wie-es-funktioniert) · [Ergebnisse](#die-ergebnisse) · [Was wir gelernt haben](#was-wir-gelernt-haben) · [Selbst starten](#selbst-starten) · [Daten & Lizenzen](#daten-und-lizenzen)
+[The site](#the-site) · [How it works](#how-it-works) · [Results](#the-results) · [What we learned](#what-we-learned) · [Run it yourself](#run-it-yourself) · [Data & licences](#data-and-licences)
 
 </div>
 
-![Startseite](docs/hub.png)
+![Start page](docs/hub.png)
 
-## Worum es geht
+## What this is about
 
-Google hat mit **TimesFM 3.0** ein Modell veröffentlicht, das auf Milliarden von Zeitreihen trainiert wurde,
-Verkaufszahlen, Sensorwerte, Webtraffic, was auch immer. Die Idee: Man gibt ihm irgendeine Zahlenreihe aus der
-Vergangenheit, und es sagt die nächsten Werte voraus. **Ohne Training, ohne Anpassung, ohne zu wissen, was die
-Zahlen bedeuten.** Das nennt man *zero-shot*.
+Google released **TimesFM 3.0**, a model trained on billions of time series: sales figures, sensor readings,
+web traffic, whatever. The idea: you hand it any series of numbers from the past and it predicts the next
+values. **No training, no tuning, no idea what the numbers mean.** That is called *zero-shot*.
 
-Das klingt nach Magie. Also haben wir es auf drei sehr verschiedene Dinge losgelassen und jedes Mal gefragt:
-*Ist das wirklich besser als das, was man sonst tut?*
+It sounds like magic. So we pointed it at three very different things and asked the same question each time:
+*Is this really better than what people do anyway?*
 
-| | Szenario | Die Frage | Gegner | Ergebnis |
+| | Scenario | The question | Opponent | Result |
 |---|---|---|---|---|
-| 01 | **Erdbeben** | Wo bebt es als Nächstes? | Die Häufigkeit der letzten 50 Jahre | **Unentschieden** |
-| 02 | **Strom** | Wie viel Last zieht das Netz morgen um 18 Uhr? | Klassische Statistik (Holt-Winters, STL) | **TimesFM gewinnt** |
-| 03 | **Wetter** | Wie warm wird es in fünf Tagen? | Ein echtes Wettermodell (ICON, ECMWF) | **Wettermodell gewinnt** |
+| 01 | **Earthquakes** | Where does it shake next? | The frequency of the last 50 years | **A draw** |
+| 02 | **Electricity** | How much load does the grid draw tomorrow at 6 pm? | Classical statistics (Holt-Winters, STL) | **TimesFM wins** |
+| 03 | **Weather** | How warm will it be in five days? | A real weather model (ICON, ECMWF) | **The weather model wins** |
 
-Die kurze Erklärung, warum die Antworten so verschieden ausfallen, steht am Ende. Sie ist der eigentliche
-Befund des Projekts.
+The short explanation of why the answers differ so much is at the end. It is the actual finding of the project.
 
-## Die Seite
+## The site
 
-Eine Startseite, drei Unterseiten, jede in ihrem eigenen Design. Alles läuft lokal im Browser.
+One start page, three sub-pages, each in its own design. Everything runs locally in the browser.
 
 | | |
 |---|---|
-| ![Erdbeben](docs/erdbeben.png) | ![Strom](docs/strom.png) |
-| **Erdbeben** — 23 000 Beben seit 1965 auf einem Punktwolken-Globus, in Grün die Prognose bis 2026. Klick auf eine Region dreht den Globus dorthin. | **Strom** — Der Backtest als Zeitreise: Mit dem Slider springt man durch 104 Wochen und sieht, wer diese Woche am besten lag. |
+| ![Earthquakes](docs/erdbeben.png) | ![Electricity](docs/strom.png) |
+| **Earthquakes**: 23,000 quakes since 1965 on a point-cloud globe, the forecast up to 2026 in green. Click a region and the globe turns there. | **Electricity**: the backtest as time travel. The slider walks through 104 weeks and shows who was best each week. |
 
-![Wetter](docs/screenshot.png)
+![Weather](docs/screenshot.png)
 
-**Wetter** — Die einzige Seite, die *live* rechnet. Stadt suchen, und TimesFM sagt auf der CPU in drei Sekunden die
-nächsten fünf Tage voraus, daneben das Wettermodell von Open-Meteo. Gestrichelt in der Vergangenheit: was beide
-vor fünf Tagen gesagt haben, über der Wahrheit. Rechts das gemessene Duell.
+**Weather**: the only page that computes *live*. Search a city and TimesFM forecasts the next five days on the CPU
+in about three seconds, next to the weather model from Open-Meteo. Dashed lines in the past show what both said
+five days ago, laid over what really happened. On the right, the measured duel.
 
-## Wie es funktioniert
+## How it works
 
-### Das Modell
+### The model
 
-TimesFM ist ein Transformer, dieselbe Architektur wie bei Sprachmodellen, nur dass die „Wörter“ hier Stücke
-einer Zahlenreihe sind. Man gibt ihm die letzten Werte (den *Kontext*, bei uns 92 Tage bis ein Jahr) und
-bekommt die nächsten 168 Stunden zurück, dazu neun Quantile, also ein Unsicherheitsband. Das Ganze läuft auf
-einem normalen Laptop ohne Grafikkarte: 183 Wochenvorhersagen in 53 Sekunden.
+TimesFM is a transformer, the same architecture as language models, except that the "words" are chunks of a
+number series. You give it the recent values (the *context*, 92 days to a year in our case) and get the next
+168 hours back, plus nine quantiles, i.e. an uncertainty band. It runs on an ordinary laptop without a GPU:
+183 week-long forecasts in 53 seconds.
 
-### Der Test
+### The test
 
-Man kann ein Vorhersagemodell nicht bewerten, indem man ihm die Zukunft zeigt. Deshalb der **Backtest**:
+You cannot judge a forecasting model by showing it the future. Hence the **backtest**:
 
-1. Wir nehmen einen Tag in der Vergangenheit, etwa den 1. März 2025, und schneiden dort die Daten ab.
-2. Jedes Modell sieht nur, was davor war, und sagt die nächste Woche voraus.
-3. Wir vergleichen mit dem, was dann wirklich passiert ist.
-4. Zwei Tage weiter, noch mal. Und noch mal. Beim Wetter 1 281 Mal, beim Strom 104 Mal.
+1. Take a day in the past, say 1 March 2025, and cut the data there.
+2. Every model sees only what came before and forecasts the next week.
+3. Compare with what actually happened.
+4. Move two days ahead and repeat. 1,281 times for the weather, 104 times for the grid.
 
-Dabei gelten harte Regeln: Kein Modell darf in die Zukunft schauen, auch nicht durch die Hintertür. Die
-Klimatologie kennt nur die Jahre vor dem Testjahr, Parameter werden auf einem Vorjahr eingestellt, und die
-Unsicherheitsbänder der klassischen Verfahren kommen aus früheren Fehlern, nicht aus dem Testjahr.
+Strict rules apply: no model may peek at the future, not even through the back door. The climatology knows
+only the years before the test year, parameters are tuned on an earlier year, and the uncertainty bands of the
+classical methods come from earlier errors, never from the test year.
 
-### Die Gegner
+### The opponents
 
-Ein Modell ist nur so gut wie der Gegner, gegen den man es misst. Deshalb sind die Gegner absichtlich stark:
+A model is only as good as the opponent it is measured against, so the opponents are deliberately strong:
 
-- **Persistenz**: „Morgen wie heute.“ Beim Wetter erstaunlich schwer zu schlagen.
-- **Klimatologie**: Das langjährige Mittel für diesen Tag und diese Stunde.
-- **Blend**: Persistenz, die langsam in die Klimatologie übergeht. Die beste Trivialmethode.
-- **Holt-Winters, STL + ETS**: Die klassische Statistik für saisonale Reihen (Strom).
-- **Wettermodelle**: Open-Meteo liefert für jeden Ort das beste regionale Modell (ICON in Europa, GFS in den
-  USA, JMA in Japan), dazu ECMWF als weltweit einheitlichen Vergleich. Beide aus dem Archiv, so wie sie am
-  jeweiligen Tag tatsächlich veröffentlicht wurden.
+- **Persistence**: "tomorrow like today". Surprisingly hard to beat for weather.
+- **Climatology**: the long-term average for this day and hour.
+- **Blend**: persistence that slowly fades into climatology. The best trivial method.
+- **Holt-Winters, STL + ETS**: classical statistics for seasonal series (electricity).
+- **Weather models**: Open-Meteo serves the best regional model for every place (ICON in Europe, GFS in the
+  US, JMA in Japan), plus ECMWF as a worldwide uniform reference. Both come from the archive, exactly as
+  published on the day in question.
 
-## Die Ergebnisse
+## The results
 
-### 02 · Strom: TimesFM gewinnt deutlich
+### 02 · Electricity: TimesFM wins clearly
 
-Stündliche Netzlast der PJM-Region (USA), 104 Wochen, 168 Stunden voraus. Fehler in Megawatt.
+Hourly load of the PJM region (USA), 104 weeks, 168 hours ahead. Error in megawatts.
 
-| Modell | MAE | vs. beste Klassik | Beste Wochen |
+| Model | MAE | vs. best classical | Best weeks |
 |---|---:|---:|---:|
-| Saisonale Naive (gleiche Stunde letzte Woche) | 3 541 | | 1 |
-| Naive, Mittel der letzten 4 Wochen | 3 205 | | 5 |
-| Holt-Winters, Wochensaison | 3 463 | | 2 |
-| STL + ETS | 3 272 | | 2 |
-| TimesFM 3.0, 8 Wochen Kontext | 1 846 | −42 % | 5 |
-| **TimesFM 3.0, 1 Jahr Kontext** | **1 461** | **−54 %** | **62** |
-| TimesFM 3.0, 4 Regionen gemeinsam | 1 768 | −45 % | 21 |
+| Seasonal naive (same hour last week) | 3,541 | | 1 |
+| Naive, mean of the last 4 weeks | 3,205 | | 5 |
+| Holt-Winters, weekly season | 3,463 | | 2 |
+| STL + ETS | 3,272 | | 2 |
+| TimesFM 3.0, 8-week context | 1,846 | −42 % | 5 |
+| **TimesFM 3.0, 1-year context** | **1,461** | **−54 %** | **62** |
+| TimesFM 3.0, 4 regions jointly | 1,768 | −45 % | 21 |
 
-TimesFM schlägt die saisonale Naive in **100 von 104 Wochen**. An Vorlauf 1 h liegt es bei 143 MW, die
-Klassiker bei rund 3 000 MW, weil sie an der letzten Woche kleben. In Hitzewochen verdoppeln die Klassiker
-ihren Fehler, TimesFM mit einem Jahr Kontext nicht: Es hat den Sommer davor gesehen.
+TimesFM beats the seasonal naive in **100 of 104 weeks**. At a lead of 1 h it sits at 143 MW while the
+classical methods are around 3,000 MW, because they are anchored to last week. In heat weeks the classical
+errors double; TimesFM with a year of context does not: it has seen the previous summer.
 
-### 03 · Wetter: das Wettermodell gewinnt, aber TimesFM hat einen guten Tag
+### 03 · Weather: the weather model wins, but TimesFM has one good day
 
-Stündliche Temperatur, sieben Städte in sieben Klimazonen, 1 281 Vorhersagen im Jahr 2025. Fehler in °C je Vorlauftag.
+Hourly temperature, seven cities in seven climates, 1,281 forecasts in 2025. Error in °C per lead day.
 
-| Modell | Tag 1 | Tag 2 | Tag 3 | Tag 5 | Tag 7 |
+| Model | Day 1 | Day 2 | Day 3 | Day 5 | Day 7 |
 |---|---:|---:|---:|---:|---:|
-| Persistenz | 2,01 | 2,67 | 2,99 | 3,27 | 3,38 |
-| Klimatologie | 2,64 | 2,63 | 2,65 | 2,66 | 2,67 |
-| Blend | 1,92 | 2,34 | 2,50 | 2,61 | 2,65 |
-| TimesFM 3.0 (Berlin) | **1,41** | 2,43 | 2,96 | 3,15 | 3,36 |
-| Wettermodell Open-Meteo | 1,34 | 1,63 | 1,72 | 2,04 | 2,48 |
-| **Wettermodell ECMWF** | **0,83** | **0,99** | **1,13** | **1,52** | **2,05** |
+| Persistence | 2.01 | 2.67 | 2.99 | 3.27 | 3.38 |
+| Climatology | 2.64 | 2.63 | 2.65 | 2.66 | 2.67 |
+| Blend | 1.92 | 2.34 | 2.50 | 2.61 | 2.65 |
+| TimesFM 3.0 (Berlin) | **1.41** | 2.43 | 2.96 | 3.15 | 3.36 |
+| Weather model Open-Meteo | 1.34 | 1.63 | 1.72 | 2.04 | 2.48 |
+| **Weather model ECMWF** | **0.83** | **0.99** | **1.13** | **1.52** | **2.05** |
 
-An Tag 1 ist TimesFM besser als jedes Trivialverfahren. Ab Tag 3 ist es auf dem Niveau der Klimatologie, ab
-Tag 2 hinter dem simplen Blend. ECMWF ist an Tag 7 noch genauer als TimesFM an Tag 2. Bemerkenswert:
-Die **Unsicherheitsbänder** von TimesFM stimmen (78–82 % Abdeckung, der Fächer wächst von 5 auf 10 °C). Das
-Modell weiß, was es nicht weiß. Es weiß nur nichts über die Front, die übermorgen kommt.
+On day 1 TimesFM beats every trivial method. From day 3 it is at climatology level, from day 2 behind the
+simple blend. ECMWF at day 7 is still more accurate than TimesFM at day 2. Remarkable, though: TimesFM's
+**uncertainty bands are right** (78–82 % coverage, the fan grows from 5 to 10 °C). The model knows what it
+does not know. It just knows nothing about the front arriving the day after tomorrow.
 
-TimesFM ist beim Wetter bisher für Berlin (alle Varianten) und Reykjavík gerechnet; die anderen fünf Städte
-folgen (Befehle unten). Die vollständigen Tabellen mit allen Varianten, Symbol-Trefferquoten und Bändern
-stehen in [docs/README-wetter-details.md](docs/README-wetter-details.md).
+For the weather, TimesFM has so far been run for Berlin (all variants) and Reykjavík; the other five cities
+follow (commands below). The full tables with all variants, symbol hit rates and bands are in
+[docs/README-weather-details.md](docs/README-weather-details.md).
 
-### 01 · Erdbeben: unentschieden, mit einem Twist
+### 01 · Earthquakes: a draw, with a twist
 
-23 000 Beben ab Magnitude 5,5 (USGS, 1965–2016). TimesFM sagt für jede 5°-Zelle voraus, wie *oft* es dort
-bebt, zehn Jahre voraus. Bewertet gegen die echten Beben eines Monats (August 2026, 50 Beben):
+23,000 quakes of magnitude 5.5+ (USGS, 1965–2016). For every 5° cell TimesFM forecasts how *often* it shakes
+there, ten years ahead. Scored against the real quakes of one month (August 2026, 50 quakes):
 
-| Maß | TimesFM | Klimatologie 1965–2016 |
+| Measure | TimesFM | Climatology 1965–2016 |
 |---|---:|---:|
-| Erwartete Anzahl (beobachtet: 50) | 57,5 | 36–42 |
-| Reale Beben in einer Prognosezelle | 49 / 50 | 49 / 50 |
-| Log-Likelihood der Zellzahlen (höher = besser) | −170,9 | −155,3 |
+| Expected count (observed: 50) | 57.5 | 36–42 |
+| Real quakes inside a forecast cell | 49 / 50 | 49 / 50 |
+| Log-likelihood of the cell counts (higher is better) | −170.9 | −155.3 |
 
-„49 von 50“ klingt spektakulär und ist es nicht, weil die Häufigkeit der letzten 50 Jahre dasselbe schafft:
-Beben passieren dort, wo sie immer passieren. Das Modell trifft das **Niveau** besser als die Klimatologie,
-die räumliche Verteilung nicht. Ein Monat ist außerdem viel zu kurz für eine Zehnjahresprognose.
+"49 of 50" sounds spectacular and is not, because the frequency of the last 50 years achieves the same:
+quakes happen where they have always happened. The model gets the **level** better than climatology, the
+spatial pattern not. And one month is far too short for a ten-year forecast.
 
-## Was wir gelernt haben
+## What we learned
 
-**Die eine Regel.** TimesFM gewinnt genau so lange, wie die Zukunft in der eigenen Vergangenheit der Reihe
-steckt. Stromlast ist Kalender plus Gewohnheit, also gewinnt es die ganze Woche. Temperatur hat etwa einen Tag
-Gedächtnis, danach entscheidet eine Front, die tausend Kilometer entfernt entstanden ist, also gewinnt es einen
-Tag. Erdbeben sind räumlich stabil und zeitlich fast zufällig, also bleibt nur die Häufigkeit. Das ist keine
-Schwäche des Modells, sondern eine Eigenschaft des Gegenstands.
+**The one rule.** TimesFM wins exactly as long as the future is contained in the series' own past. Grid load
+is calendar plus habit, so it wins all week. Temperature has about one day of memory, after that a front that
+formed a thousand kilometres away decides, so it wins one day. Earthquakes are spatially stable and temporally
+almost random, so only the frequency is left. That is not a weakness of the model; it is a property of the subject.
 
-**Die Bänder stimmen.** Ohne jede Kalibrierung deckt das 10–90-%-Band in allen Szenarien rund 80 % der
-Wahrheit ab. Ehrliche Unsicherheit *out of the box* ist im Alltag oft wertvoller als ein paar Zehntel weniger Fehler.
+**The bands are right.** Without any calibration the 10–90 % band covers about 80 % of the truth in every
+scenario. Honest uncertainty out of the box is often worth more in practice than a few tenths less error.
 
-**Kontext ja, Erklärungen nein.** Ein Jahr Kontext hilft in beiden Backtests. Kalender-Kovariaten (Stunde,
-Wochentag als Zusatzinput) haben in beiden leicht geschadet und das Zehnfache an Rechenzeit gekostet.
+**Context yes, explanations no.** A year of context helps in both backtests. Calendar covariates (hour, weekday
+as extra input) hurt slightly in both and cost ten times the compute.
 
-**Es vergisst nicht.** TimesFM schreibt die letzten Tage fort, statt zur Klimatologie zurückzukehren. In
-Phoenix hält es an der Hitze der Vorwoche fest, obwohl sie vorbei ist. Ein Blend aus TimesFM und Klimatologie
-ab Tag 2 würde vermutlich jedes Trivialverfahren an jedem Tag schlagen.
+**It does not forget.** TimesFM extends the last few days instead of returning to climatology. In Phoenix it
+holds on to last week's heat after it is gone. A blend of TimesFM and climatology from day 2 on would probably
+beat every trivial method on every day.
 
-**Der Gegner muss stark sein.** Open-Meteos `best_match` ist in Phoenix (GFS) an Tag 3 schlechter als unser
-Blend. Ohne die ECMWF-Spalte hätten wir einen falschen Schluss gezogen.
+**The opponent has to be strong.** Open-Meteo's `best_match` in Phoenix (GFS) is worse than our blend at
+day 3. Without the ECMWF column we would have drawn the wrong conclusion.
 
-**Die Fehler steckten in den Daten.** Open-Meteo liefert 58 der versprochenen 92 Tage; ein `interpolate()` hat
-daraus 34 Tage flache Linie gemacht und sie dem Modell als Kontext gegeben. Ungleich lange Kontexte in einem
-Batch kommen still als NaN zurück. Beide Fehler hätten das Ergebnis unbemerkt verfälscht. Die Messinfrastruktur
-war mehr Arbeit als die Modelle, und das zu Recht.
+**The bugs were in the data.** Open-Meteo returns 58 of the promised 92 days; an `interpolate()` turned that
+into 34 days of flat line and fed it to the model as context. Contexts of unequal length in one batch come
+back silently as NaN. Either bug would have distorted the result unnoticed. The measurement infrastructure
+was more work than the models, and rightly so.
 
-## Selbst starten
+## Run it yourself
 
-Voraussetzungen: Node 22, Python 3.12, [uv](https://docs.astral.sh/uv/). Die TimesFM-Gewichte (1,2 GB) lädt der
-erste Lauf automatisch von Hugging Face.
+Requirements: Node 22, Python 3.12, [uv](https://docs.astral.sh/uv/). The TimesFM weights (1.2 GB) are
+downloaded from Hugging Face on the first run.
 
 ```bash
 git clone https://github.com/Litorian113/FutureForecast.git && cd FutureForecast
 npm install
 uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requirements.txt
 
-npm run dev                          # http://localhost:5503  (Startseite, alle drei Szenarien)
-.venv/bin/python weather/server.py   # Port 8000, nur das Wetter braucht ihn (rechnet live)
+npm run dev                          # http://localhost:5503  (start page, all three scenarios)
+.venv/bin/python weather/server.py   # port 8000, only the weather page needs it (it computes live)
 ```
 
-Die Backtest-Ergebnisse liegen als JSON im Repo, die Seiten funktionieren also sofort. Wer die Zahlen
-nachrechnen will:
+The backtest results ship as JSON in the repo, so the pages work right away. To recompute the numbers:
 
 ```bash
-.venv/bin/python weather/prepare_weather.py     # ERA5-Historie für sieben Städte (gecacht)
-.venv/bin/python weather/nwp.py                 # archivierte Wettermodell-Läufe 2025
+.venv/bin/python weather/prepare_weather.py     # ERA5 history for seven cities (cached)
+.venv/bin/python weather/nwp.py                 # archived weather-model runs of 2025
 .venv/bin/python weather/backtest.py --models persistence naive_week climatology blend nwp nwp_ecmwf
-.venv/bin/python weather/backtest.py --models timesfm timesfm_multi timesfm_cov timesfm_long   # ≈ 25 min je Stadt
-.venv/bin/python weather/backtest.py            # JSON zusammensetzen
-.venv/bin/python weather/report.py              # Markdown-Tabellen
+.venv/bin/python weather/backtest.py --models timesfm timesfm_multi timesfm_cov timesfm_long   # ≈ 25 min per city
+.venv/bin/python weather/backtest.py            # assemble the JSON
+.venv/bin/python weather/report.py              # Markdown tables
 ```
 
-Für Strom und Erdbeben liegen die Rechen-Pipelines in den Ursprungsprojekten (FutureGrid,
-Erdbeben-Visualisierung); hier sind ihre Seiten und fertigen Ergebnisse eingebaut.
+The compute pipelines for electricity and earthquakes live in their original projects (FutureGrid, the
+earthquake visualisation); this repo contains their pages and finished results.
 
-Intel-Mac: torch 2.2.2 ist das letzte Release, deshalb `numpy<2` und der RMSNorm-Shim in
-`weather/torch_compat.py`. Auf Apple Silicon und Linux läuft ein aktuelles torch direkt.
+Intel Mac: torch 2.2.2 is the last release, hence `numpy<2` and the RMSNorm shim in `weather/torch_compat.py`.
+On Apple Silicon and Linux a current torch works as-is.
 
-## Aufbau
+## Layout
 
 ```
-index.html · wetter.html · strom.html · erdbeben.html   vier Vite-Einstiege, jede Seite mit eigenem Bundle
-src/hub/          Startseite
-src/wetter/       Wetter: React-App, live gegen den FastAPI-Server
-src/strom/        FutureGrid, unverändert übernommen
-src/erdbeben/     Erdbeben-Visualisierung (three.js), hier nur der Globus
-weather/          Python: Open-Meteo-Client, Backtest, Modelle, Server
-public/data/      Backtest-Ergebnisse (JSON), Erdbeben- und Tsunami-Daten
-docs/             Screenshots und die ausführliche Wetter-Dokumentation
+index.html · wetter.html · strom.html · erdbeben.html   four Vite entries, each page with its own bundle
+src/hub/          start page
+src/wetter/       weather: React app, live against the FastAPI server
+src/strom/        FutureGrid, taken over unchanged
+src/erdbeben/     earthquake visualisation (three.js), only the globe here
+weather/          Python: Open-Meteo client, backtest, models, server
+public/data/      backtest results (JSON), earthquake and tsunami data
+docs/             screenshots and the detailed weather write-up
 ```
 
-Technik: React 18, TypeScript, Vite (Multi-Page), three.js für den Globus, alle Diagramme als handgeschriebenes
-SVG. Python 3.12 mit TimesFM 3.0 (PyTorch), pandas, FastAPI. Screenshots per Headless Chrome (`scripts/shot.mjs`).
+Stack: React 18, TypeScript, Vite (multi-page), three.js for the globe, every chart hand-written SVG.
+Python 3.12 with TimesFM 3.0 (PyTorch), pandas, FastAPI. Screenshots via headless Chrome (`scripts/shot.mjs`).
 
-## Daten und Lizenzen
+## Data and licences
 
-Der Code in diesem Repository steht unter der [MIT-Lizenz](LICENSE).
+The code in this repository is under the [MIT licence](LICENSE).
 
-| Was | Quelle | Lizenz |
+| What | Source | Licence |
 |---|---|---|
-| TimesFM 3.0 (Code) | [google-research/timesfm](https://github.com/google-research/timesfm) | Apache 2.0 |
-| TimesFM 3.0 (Gewichte) | [Hugging Face](https://huggingface.co/google/timesfm-3.0-pytorch) | **nicht kommerziell**; werden nicht mitgeliefert, sondern beim ersten Lauf geladen |
-| Wetterdaten, Wettermodell-Archiv, Geocoding | [Open-Meteo](https://open-meteo.com) | CC BY 4.0 |
-| ERA5-Reanalyse (über Open-Meteo) | Copernicus / ECMWF | frei mit Quellenangabe |
-| Stromlast PJM | Kaggle, [robikscube/hourly-energy-consumption](https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption) | CC0 |
-| Erdbeben | USGS | Public Domain |
-| Tsunamis | NOAA NCEI | Public Domain |
-| Schriften | Inter, Sometype Mono via Google Fonts | SIL Open Font License |
-| Bibliotheken | React, three.js, Vite, PyTorch, pandas, FastAPI u. a. | MIT / BSD |
+| TimesFM 3.0 (code) | [google-research/timesfm](https://github.com/google-research/timesfm) | Apache 2.0 |
+| TimesFM 3.0 (weights) | [Hugging Face](https://huggingface.co/google/timesfm-3.0-pytorch) | **non-commercial**; not shipped, downloaded on first run |
+| Weather data, weather-model archive, geocoding | [Open-Meteo](https://open-meteo.com) | CC BY 4.0 |
+| ERA5 reanalysis (via Open-Meteo) | Copernicus / ECMWF | free with attribution |
+| PJM grid load | Kaggle, [robikscube/hourly-energy-consumption](https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption) | CC0 |
+| Earthquakes | USGS | public domain |
+| Tsunamis | NOAA NCEI | public domain |
+| Fonts | Inter, Sometype Mono via Google Fonts | SIL Open Font License |
+| Libraries | React, three.js, Vite, PyTorch, pandas, FastAPI and others | MIT / BSD |
 
-Die Weltkarte des Globus ist
-[„Equirectangular projection world map without borders“](https://commons.wikimedia.org/wiki/File:Equirectangular_projection_world_map_without_borders.svg)
-von Ebrahim, Wikimedia Commons, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), unverändert
-verwendet. Die übrigen Grafiken sind eigene Arbeiten. Die mitgelieferten JSON-Dateien sind aus den genannten
-Quellen abgeleitete Ergebnisse, keine Rohdaten.
+The globe's world map is
+["Equirectangular projection world map without borders"](https://commons.wikimedia.org/wiki/File:Equirectangular_projection_world_map_without_borders.svg)
+by Ebrahim, Wikimedia Commons, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), used unchanged.
+The remaining graphics are original work. The bundled JSON files are results derived from the sources above,
+not raw data.
 
-## Über das Projekt
+## About
 
-Entstanden 2026 an der HfG Schwäbisch Gmünd als Frage an ein neues Werkzeug: Wie weit kommt ein
-Foundation-Modell für Zeitreihen, wenn man es ehrlich misst? Die Antwort in einem Satz:
+Made in 2026 at HfG Schwäbisch Gmünd as a question to a new tool: how far does a foundation model for time
+series get when measured honestly? The answer in one sentence:
 
-> *Ein Foundation-Modell für Zeitreihen ist ein sehr guter Statistiker, der nichts von der Welt weiß.
-> Wo die Reihe die Welt enthält, gewinnt er. Wo die Welt außerhalb der Reihe passiert, muss man sie ihm bringen.*
+> *A foundation model for time series is a very good statistician who knows nothing about the world.
+> Where the series contains the world, it wins. Where the world happens outside the series, you have to bring it in.*
 
-Franz Anhäupl · Umsetzung mit Claude Code
+Franz Anhäupl · built with Claude Code
