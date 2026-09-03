@@ -7,7 +7,7 @@ One model, three subjects, three honest answers.
 
 Earthquakes · Electricity · Weather, each measured against whatever is the standard there.
 
-[The site](#the-site) · [How it works](#how-it-works) · [Results](#the-results) · [What we learned](#what-we-learned) · [Run it yourself](#run-it-yourself) · [Data & licences](#data-and-licences)
+[The site](#the-site) · [How it works](#how-it-works) · [Results](#the-results) · [What we learned](#what-we-learned) · [Open work](#open-work-and-known-issues) · [Run it yourself](#run-it-yourself) · [Data & licences](#data-and-licences)
 
 </div>
 
@@ -160,6 +160,60 @@ day 3. Without the ECMWF column we would have drawn the wrong conclusion.
 into 34 days of flat line and fed it to the model as context. Contexts of unequal length in one batch come
 back silently as NaN. Either bug would have distorted the result unnoticed. The measurement infrastructure
 was more work than the models, and rightly so.
+
+## Open work and known issues
+
+### To do, roughly in order of how much they would change the picture
+
+- [ ] **Weather model as a covariate** (`timesfm_nwp`). So far TimesFM and the weather model are opponents.
+      Given the model's 120 h forecast as a `past_future_covariate`, TimesFM could learn how that model is
+      biased at this very place, which is what weather services build by hand as MOS post-processing.
+      The backtest for it already exists; it is one more entry in `weather/models_timesfm.py`.
+- [ ] **TimesFM for the remaining five weather cities.** Phoenix, Singapore, Cape Town, Denver and Tokyo, plus
+      `timesfm_long` for Reykjavík. About two hours of CPU:
+      `weather/backtest.py --cities Phoenix Singapore CapeTown Denver Tokyo --models timesfm timesfm_multi timesfm_cov timesfm_long --no-json`
+- [ ] **Hybrid TimesFM → climatology.** Blend the TimesFM mean into the climatology from day 2 on, the way the
+      `blend` baseline does with persistence. Expected to beat every trivial method on every day. Two lines.
+- [ ] **A live scorecard that accumulates.** The daily launchd job already archives the weather-model forecast
+      for the seven cities; store TimesFM's forecast next to it, and after a few months the page can show a
+      measured duel for those cities instead of one from the backtest year.
+- [ ] **Earthquakes: keep scoring.** One month against a ten-year rate forecast is nothing. Re-run the
+      evaluation monthly and watch the log-likelihood against climatology over a year.
+- [ ] **Electricity: weather as a covariate.** The mirror image of the first item; the gain is probably smaller
+      (TimesFM is already at 4.6 % MAPE), but it would show whether covariates ever help this model.
+- [ ] **A better weather symbol.** Even applied to the *true* variables the rule set matches the weather code on
+      only 84 % of days. A small classifier trained on ERA5 variables → code would lift the ceiling for every model.
+- [ ] **Validate "closest test city".** The honesty chip picks the backtest city with the most similar ERA5
+      signature. Once all seven cities have TimesFM numbers, check the mapping against real cross-city errors.
+- [ ] **Longer live context.** The real-time endpoint delivers ~58 of the requested 92 days; falling back to the
+      archive API would give the live page the full year of context the backtest showed to help.
+- [ ] Translate `docs/README-weather-details.md`; it is still the German write-up with all tables.
+
+### Known issues and limitations
+
+- **Weather test year is one year (2025).** The archived weather-model runs are complete only from 2022 on for
+  `best_match` and from Feb 2024 for ECMWF; a multi-year test would need the ECMWF column to start later.
+- **`previous_day1` is the previous day's model run.** The weather model had observations up to 12–24 h before
+  the cutoff, TimesFM up to the last hour. The comparison is tilted slightly in TimesFM's favour.
+- **Grid values, not stations.** Truth and history are ERA5 grid cells (9–25 km), smoother than a station.
+  The weather models are scored against that same ERA5; `best_match` carries a +0.7 °C bias against it.
+- **Open-Meteo returns less past data than requested.** `past_days=92` yields ~58 days for Berlin; the server
+  drops the empty leading block instead of back-filling it (which it silently did before, feeding TimesFM a
+  month of flat line). The page shows the real context length.
+- **Ragged multivariate batches come back as NaN** from `timesfm3`. Contexts of different length in one
+  `predict_batch` call produce all-NaN output without an error; the server trims them to equal length.
+- **First request per city takes ~4 s** (live forecast plus three chained hindcast runs on the CPU); results
+  are cached per hour in memory only and vanish on restart.
+- **`timesfm_cov` is ten times slower** than the plain variant (515 s vs 53 s per city) and no better.
+- **Dead code in `src/erdbeben/pages/`.** Overview, Time Beam, Comparison and Depth are kept from the original
+  project but not routed; `react-router-dom` stays a dependency only because of them.
+- **The globe preview on the start page is synthetic.** The seismic belts there are drawn by hand; the real
+  data only loads on the earthquake page.
+- **Desktop only.** The pages are laid out for 1440 × 900; the start page stacks below 1100 px, the three
+  scenario pages do not. The electricity and earthquake pages are dark-mode only.
+- **Intel Macs are stuck on torch 2.2.2**, hence `numpy<2` and the `RMSNorm` shim. Apple Silicon and Linux
+  run a current torch.
+- **The TimesFM 3.0 weights are non-commercial.** Run it locally, do not ship it as a service.
 
 ## Run it yourself
 
