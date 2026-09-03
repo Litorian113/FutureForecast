@@ -50,14 +50,12 @@ export default function DayCards({ data, source, selected, onSelect }: Props) {
 
 function Row({ card, color, label }: { card: DayCard; color: string; label: string }) {
   return (
-    <span className="row" title={label}>
+    <span className="row" title={label} style={{ borderLeft: `3px solid ${color}` }}>
       <WeatherIcon kind={card.icon} className="icon" title={`${label}: ${card.icon ?? '–'}`} />
       <span className="t num">
         {fmtDeg(card.tmax)} <small>{fmtDeg(card.tmin)}</small>
       </span>
-      <span className="p num" style={{ borderLeft: `3px solid ${color}`, paddingLeft: 5 }}>
-        {Math.round(card.pRain * 100)} %
-      </span>
+      <span className="p num">{Math.round(card.pRain * 100)} %</span>
     </span>
   );
 }

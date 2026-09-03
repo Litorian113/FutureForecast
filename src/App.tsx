@@ -9,6 +9,21 @@ import ErrorPopup from './components/ErrorPopup';
 
 const LS_CITY = 'fw.city';
 const LS_SOURCE = 'fw.source';
+const LS_THEME = 'fw.theme';
+type Theme = 'system' | 'light' | 'dark';
+const THEME_LABEL: Record<Theme, string> = { system: 'Auto', light: 'Hell', dark: 'Dunkel' };
+
+function loadTheme(): Theme {
+  const q = new URLSearchParams(location.search).get('theme');
+  if (q === 'dark' || q === 'light') return q;
+  try {
+    const t = localStorage.getItem(LS_THEME);
+    if (t === 'light' || t === 'dark') return t;
+  } catch {
+    /* ignore */
+  }
+  return 'system';
+}
 const DEFAULT_CITY: GeoHit = { name: 'Berlin', country: 'Deutschland', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' };
 
 function loadCity(): GeoHit {
@@ -39,12 +54,21 @@ export default function App() {
   const [error, setError] = useState<'down' | string | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [popup, setPopup] = useState(false);
+  const [theme, setTheme] = useState<Theme>(loadTheme);
 
-  // ?theme=dark|light forces the palette (used for screenshots); otherwise prefers-color-scheme rules.
+  // 'system' follows prefers-color-scheme; 'light' / 'dark' stamp data-theme on <html>.
+  // ?theme=dark|light in the URL forces one (used for screenshots).
   useEffect(() => {
-    const t = new URLSearchParams(location.search).get('theme');
-    if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
-  }, []);
+    if (theme === 'system') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme;
+    try {
+      if (theme === 'system') localStorage.removeItem(LS_THEME);
+      else localStorage.setItem(LS_THEME, theme);
+    } catch {
+      /* ignore */
+    }
+  }, [theme]);
+  const cycleTheme = () => setTheme((t) => (t === 'system' ? 'light' : t === 'light' ? 'dark' : 'system'));
 
   useEffect(() => {
     let alive = true;
@@ -99,6 +123,9 @@ export default function App() {
             </span>
           )}
           {loading && <span className="loading">lädt …</span>}
+          <button className="pillBtn" onClick={cycleTheme} aria-label={`Farbschema: ${THEME_LABEL[theme]}, wechseln`} title="Farbschema wechseln">
+            {theme === 'dark' ? '☾' : theme === 'light' ? '☀' : '◐'} {THEME_LABEL[theme]}
+          </button>
         </div>
       </header>
 

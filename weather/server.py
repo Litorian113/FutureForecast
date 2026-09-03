@@ -43,13 +43,20 @@ app = FastAPI(title="FutureWeather")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 _cache: dict[tuple, dict] = {}
 _backtest: dict | None = None
+_backtest_mtime = 0.0
 _signatures: dict[str, dict] | None = None
 
 
 def backtest() -> dict | None:
-    global _backtest
-    if _backtest is None and os.path.exists(BACKTEST):
+    """public/data/backtest.json, re-read whenever the file changes (the backtest may run while the server is up)."""
+    global _backtest, _backtest_mtime
+    if not os.path.exists(BACKTEST):
+        return None
+    mtime = os.path.getmtime(BACKTEST)
+    if _backtest is None or mtime != _backtest_mtime:
         _backtest = json.load(open(BACKTEST))
+        _backtest_mtime = mtime
+        _cache.clear()
     return _backtest
 
 
