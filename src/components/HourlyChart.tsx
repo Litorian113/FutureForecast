@@ -7,6 +7,7 @@ interface Props {
   data: ForecastResponse;
   source: Source;
   selectedDay: number | null;
+  days: number;
 }
 
 const PAD = { top: 22, right: 20, bottom: 30, left: 50 };
@@ -24,19 +25,30 @@ function niceStep(range: number): number {
   return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * pow;
 }
 
-/** 14 days of history (grey), the "now" line, then 168 h of TimesFM (band + line) and the weather
- * model (line). Hand-made SVG, horizontally scrollable, fixed Y axis, hover tooltip with both values. */
-export default function HourlyChart({ data, source, selectedDay }: Props) {
+/** 14 days of history (grey), the "now" line, then `days` days of TimesFM (band + line) and the
+ * weather model (line). Hand-made SVG, horizontally scrollable, fixed Y axis, hover tooltip with both values. */
+export default function HourlyChart({ data, source, selectedDay, days }: Props) {
   const [ref, size] = useElementSize<HTMLDivElement>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [hover, setHover] = useState<number | null>(null);
 
+  const horizon = Math.min(days * 24, data.hourly.ts.length);
   const hist = data.history.temp;
-  const tf = data.hourly.timesfm.temp;
-  const nwp = data.hourly.nwp.temp;
+  const tf = useMemo(
+    () => ({ mean: data.hourly.timesfm.temp.mean.slice(0, horizon), q10: data.hourly.timesfm.temp.q10.slice(0, horizon), q90: data.hourly.timesfm.temp.q90.slice(0, horizon) }),
+    [data, horizon],
+  );
+  const nwp = useMemo(() => data.hourly.nwp.temp.slice(0, horizon), [data, horizon]);
   const nHist = hist.length;
-  const H = data.hourly.ts.length;
+  const H = horizon;
+  // The past runs end at the cutoff, just like the history, so both are aligned at their end.
+  // The chain may reach further back than the history - then its leading hours are dropped.
+  const hind = data.hindcast;
+  const hindSkip = hind ? Math.max(0, hind.ts.length - nHist) : 0;
+  const hindOff = hind ? Math.max(0, nHist - hind.ts.length) : 0;
+  const hindTf = useMemo(() => (hind ? hind.timesfm.mean.slice(hindSkip) : []), [hind, hindSkip]);
+  const hindNwp = useMemo(() => (hind?.nwp ? hind.nwp.slice(hindSkip) : null), [hind, hindSkip]);
   const total = nHist + H;
   const cutoff = useMemo(() => parseLocal(data.hourly.ts[0]), [data]);
   const showTf = source !== 'nwp';
@@ -57,9 +69,13 @@ export default function HourlyChart({ data, source, selectedDay }: Props) {
       tf.q90.forEach(eat);
     }
     if (showNwp) nwp.forEach(eat);
+    if (hind) {
+      if (showTf) hindTf.forEach(eat);
+      if (showNwp) hindNwp?.forEach(eat);
+    }
     const pad = Math.max(1, (hi - lo) * 0.08);
     return [lo - pad, hi + pad] as const;
-  }, [hist, tf, nwp, showTf, showNwp]);
+  }, [hist, tf, nwp, showTf, showNwp, hind, hindTf, hindNwp]);
 
   const W = Math.max(size.width, total * PX_PER_HOUR);
   const Hpx = Math.max(size.height, 200);
@@ -93,7 +109,7 @@ export default function HourlyChart({ data, source, selectedDay }: Props) {
     return t;
   }, [yDomain]);
 
-  const days = useMemo(() => {
+  const dayTicks = useMemo(() => {
     const out: { i: number; date: Date }[] = [];
     const start = addHours(cutoff, -nHist);
     for (let i = 0; i < total; i++) {
@@ -122,13 +138,20 @@ export default function HourlyChart({ data, source, selectedDay }: Props) {
   const hoverPx = hover == null ? 0 : x(hover) - scrollLeft;
   const tipLeft = Math.max(PAD.left + 4, Math.min(size.width - 230, hoverPx > size.width * 0.6 ? hoverPx - 240 : hoverPx + 18));
   const k = hover == null ? -1 : hover - nHist;
-  const hv = hover == null ? null : k >= 0 ? { tf: tf.mean[k], q10: tf.q10[k], q90: tf.q90[k], nwp: nwp[k] } : { hist: hist[hover] };
+  const hi = hover == null || hind == null ? -1 : hover - hindOff;
+  const inHind = hi >= 0 && hind != null && hi < hindTf.length && k < 0;
+  const hv =
+    hover == null
+      ? null
+      : k >= 0
+        ? { tf: tf.mean[k], q10: tf.q10[k], q90: tf.q90[k], nwp: nwp[k] }
+        : { hist: hist[hover], pastTf: inHind ? hindTf[hi] : null, pastNwp: inHind ? (hindNwp?.[hi] ?? null) : null };
 
   return (
     <div className="chartWrap" ref={ref}>
       <div className="chartScroll" ref={scrollRef} onScroll={(e) => setScrollLeft(e.currentTarget.scrollLeft)}>
         <svg width={W} height={Hpx} viewBox={`0 0 ${W} ${Hpx}`} onMouseMove={onMove} onMouseLeave={() => setHover(null)} role="img" aria-label="Stündliche Temperatur: 14 Tage Historie und 7 Tage Vorhersage">
-          {days.map((d) => (
+          {dayTicks.map((d) => (
             <rect key={`n${d.i}`} className="nightBand" x={x(d.i - 3)} y={PAD.top} width={x(d.i + 6) - x(d.i - 3)} height={innerH} />
           ))}
           {selectedDay != null && (
@@ -139,12 +162,23 @@ export default function HourlyChart({ data, source, selectedDay }: Props) {
               <line key={v} x1={PAD.left} x2={PAD.left + innerW} y1={y(v)} y2={y(v)} />
             ))}
           </g>
-          {days.map((d) => (
+          {dayTicks.map((d) => (
             <text key={d.i} className="dayLabel" x={x(d.i) + 4} y={Hpx - 10}>
               {fmtDay(d.date)}
             </text>
           ))}
           {showTf && <path d={bandPath} fill="var(--c-timesfm-fill)" />}
+          {/* what the two models said `hindcastDays` ago, laid over the measured truth */}
+          {hind && (
+            <g opacity={0.5}>
+              {showNwp && hindNwp && (
+                <path d={path(pts(hindNwp, hindOff))} fill="none" stroke="var(--c-nwp)" strokeWidth={1.5} strokeDasharray="5 3" />
+              )}
+              {showTf && (
+                <path d={path(pts(hindTf, hindOff))} fill="none" stroke="var(--c-timesfm)" strokeWidth={1.5} strokeDasharray="5 3" />
+              )}
+            </g>
+          )}
           <path d={path(pts(hist, 0))} fill="none" stroke="var(--c-history)" strokeWidth={1.6} />
           {showNwp && <path d={path(pts(nwp, nHist))} fill="none" stroke="var(--c-nwp)" strokeWidth={2} strokeLinejoin="round" />}
           {showTf && <path d={path(pts(tf.mean, nHist))} fill="none" stroke="var(--c-timesfm)" strokeWidth={2.2} strokeLinejoin="round" />}
@@ -178,12 +212,36 @@ export default function HourlyChart({ data, source, selectedDay }: Props) {
         <div className="tooltip" style={{ left: tipLeft, top: 26 }}>
           <div className="when">{fmtDateTime(addHours(cutoff, hover - nHist))}</div>
           {'hist' in hv && (
-            <div className="line">
-              <span className="nm">
-                <i className="swatch" style={{ color: 'var(--c-history)' }} /> Gemessen
-              </span>
-              <span className="num">{fmtTemp(hv.hist, 1)}</span>
-            </div>
+            <>
+              <div className="line">
+                <span className="nm">
+                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> Gemessen
+                </span>
+                <span className="num">{fmtTemp(hv.hist, 1)}</span>
+              </div>
+              {showTf && hv.pastTf != null && (
+                <div className="line">
+                  <span className="nm">
+                    <i className="swatch dashed" style={{ color: 'var(--c-timesfm)', opacity: 0.6 }} /> TimesFM damals
+                  </span>
+                  <span className="num">
+                    {fmtTemp(hv.pastTf, 1)}
+                    {hv.hist != null && <span className="err">{fmtSigned(hv.pastTf - hv.hist)}</span>}
+                  </span>
+                </div>
+              )}
+              {showNwp && hv.pastNwp != null && (
+                <div className="line">
+                  <span className="nm">
+                    <i className="swatch dashed" style={{ color: 'var(--c-nwp)', opacity: 0.6 }} /> Modell damals
+                  </span>
+                  <span className="num">
+                    {fmtTemp(hv.pastNwp, 1)}
+                    {hv.hist != null && <span className="err">{fmtSigned(hv.pastNwp - hv.hist)}</span>}
+                  </span>
+                </div>
+              )}
+            </>
           )}
           {'tf' in hv && showTf && (
             <div className="line">

@@ -12,7 +12,7 @@ React · TypeScript · Vite · Python · FastAPI · Open-Meteo · TimesFM 3.0
 
 ![FutureWeather, hell](docs/screenshot.png)
 
-<p align="center"><sub>Modus „beide“: TimesFM (blau, mit 10–90-%-Band) neben dem Wettermodell von Open-Meteo (orange), 14 Tage Historie in Grau.</sub></p>
+<p align="center"><sub>Modus „beide“: TimesFM (blau, mit 10–90-%-Band) neben dem Wettermodell von Open-Meteo (orange). In der Historie liegen gestrichelt die Vorhersagen, die beide vor fünf Tagen abgegeben haben, über der gemessenen Wahrheit; rechts das gemessene Duell.</sub></p>
 
 ---
 
@@ -79,14 +79,31 @@ Eine Vollbild-Ansicht (1440 × 900, ohne Scrollen), weiches monochromes Neumorph
 - **Stadtsuche** als versenkte Pille mit Geocoding-Vorschlägen (Debounce 250 ms, Pfeiltasten, Enter);
   letzte Stadt im `localStorage`.
 - **Hero**: aktuelle Temperatur, Symbol, ein Satz und der Schalter **TimesFM · Wettermodell · beide**.
-- **Sieben Tageskarten**: Wochentag, Symbol, Max/Min, Regen-%; bei „beide“ zwei Zeilen je Karte;
+- **Fünf Tageskarten**: Wochentag, Symbol, Max/Min, Regen-%; bei „beide“ zwei beschriftete Blöcke je Karte;
   Klick markiert den Tag in der Kurve, die gewählte Karte ist versenkt.
-- **Stundenkurve**: 14 Tage Historie, Cutoff-Linie „jetzt“, 168 h mit TimesFM-Band und Wettermodell-Linie;
+- **Duell-Widget rechts**: der gemessene Vergleich der beiden Verfahren. Oben der Sieger und um welchen
+  Faktor er genauer ist (geometrisches Mittel über die gezeigten Tage), darunter je Vorlauftag ein Balken,
+  der nach links (TimesFM vorn) oder rechts (Wettermodell vorn) ausschlägt, plus die MAE-Spanne beider.
+  Alles aus dem Backtest der klimatisch nächsten Test-Stadt, nicht aus der laufenden Vorhersage — die
+  Wahrheit von übermorgen ist ja noch nicht bekannt. Darunter steht **„hier gemessen“**: der Fehler, den
+  beide Verfahren in den drei zurückliegenden Durchläufen an genau diesem Ort wirklich gemacht haben.
+  Dieser Teil existiert für jeden Ort, auch für die Städte, deren TimesFM-Backtest noch aussteht —
+  für Phoenix etwa TimesFM 3,27 °C gegen Wettermodell 2,11 °C.
+- **Stundenkurve**: 14 Tage Historie, Cutoff-Linie „jetzt“, 120 h mit TimesFM-Band und Wettermodell-Linie;
   Hover mit Zeit, beiden Werten und Differenz; handgebautes SVG, horizontal scrollbar bei fixer Y-Achse.
+- **Rückblick über der Historie**: dieselbe Vorhersage, aber **dreimal in der Vergangenheit gestartet**
+  (vor 15, 10 und 5 Tagen, je 120 h) und aneinandergehängt, sodass die gestrichelten Modelllinien die
+  komplette 14-Tage-Historie abdecken. Halbtransparent über der gemessenen Kurve sieht man sofort, wo
+  jedes Modell danebenlag; der Hover zeigt Messwert, beide Vorhersagen von damals und ihre Abweichung.
+  Die drei TimesFM-Läufe entstehen im selben Batch wie die Live-Vorhersage (Gesamtlaufzeit ≈ 4 s), die
+  Wettermodell-Linien kommen aus dem `previous-runs`-Archiv.
 - **Ehrlichkeits-Chip**: „Erwarteter Fehler Tag 1 / Tag 5“ aus dem Backtest; Klick öffnet die MAE-Kurve
   je Vorlauftag für Persistenz, Blend, Klimatologie, TimesFM und Wettermodell.
 - Eigener SVG-Symbolsatz (Sonne, Wolke, Regen, Schnee, Nebel), Linien Blau / Orange / Grau mit Strichmuster
   als zweiter Kodierung, sichtbarer Fokusring, Text ≥ 4,5:1.
+
+Die Seite zeigt **fünf Tage** voraus (Konstante `DAYS_SHOWN` in `src/App.tsx`); Server und Backtest
+rechnen unverändert die vollen 168 h, damit die Tabellen bis Tag 7 reichen.
 
 Die Seite rechnet **live für jede Stadt**: der FastAPI-Server holt die letzten 92 Tage vom
 Open-Meteo-Echtzeit-Endpunkt, lässt TimesFM 3.0 als 6-variaten Kontext auf der CPU laufen (≈ 3 s) und stellt
@@ -385,6 +402,10 @@ Stoppen: `pkill -f weather/server.py`, `pkill -f backtest.py`, `pkill -f vite`.
 - TimesFM ist zero-shot ohne Kalibrierung; ein kalibriertes Band wäre leicht zu bauen, ist aber nicht die Frage.
 - Die TimesFM-3.0-Gewichte sind **nicht kommerziell** lizenziert (Google); nur lokal betreiben.
 - Open-Meteo: Fair-Use-Limit ~10 000 Anfragen/Tag, deshalb Platten-Cache; ERA5 hinkt ~5 Tage nach.
+- **Live-Kontext ist kürzer als 92 Tage.** Der Echtzeit-Endpunkt akzeptiert `past_days=92`, liefert aber
+  nicht immer so viel: für Berlin sind die ältesten ~34 Tage leer. Der Server verwirft den führenden
+  Leerblock und meldet die tatsächliche Kontextlänge (aktuell ~1 300 h) auf der Seite. Der Backtest ist
+  davon nicht betroffen, er arbeitet auf ERA5.
 
 ## Struktur
 

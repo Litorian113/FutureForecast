@@ -328,8 +328,13 @@ def main() -> None:
 
     # ------------------------------------------------------------ pooled arrays
     cities = list(per_city)
+    # pooled tables need a model in every city; per-city tables report whatever that city has
     names = [n for n in all_names if all(n in per_city[c]["results"] for c in cities)]
+    city_names = {c: [n for n in all_names if n in per_city[c]["results"]] for c in cities}
+    extra = sorted({n for ns in city_names.values() for n in ns} - set(names))
     print(f"\nmodels in every city: {names}")
+    if extra:
+        print(f"only in some cities (per-city tables only): {extra}")
 
     def pooled(key):
         return np.concatenate([per_city[c][key] for c in cities])
@@ -384,7 +389,7 @@ def main() -> None:
     for c in cities:
         pc = per_city[c]
         by_city[c] = {"tau": pc["tau"], "cutoffs": len(pc["cutoffs"]), "models": {}}
-        for n in names:
+        for n in city_names[c]:
             r = pc["results"][n]
             t = r["vars"]["temp"]
             m = temp_metrics(pc["actual"]["temp"], t, pc["clim_mean"])
@@ -442,6 +447,7 @@ def main() -> None:
     out = {
         "meta": {
             "year": args.year, "horizon": H, "stepDays": args.step, "leadDays": LEAD_DAYS, "cities": cities, "models": names,
+            "modelsByCity": city_names,
             "generated": time.strftime("%Y-%m-%dT%H:%M"),
             "cutoffsPerCity": {c: len(per_city[c]["cutoffs"]) for c in cities},
             "runtimeSec": {n: round(P[n]["seconds"], 1) for n in names},

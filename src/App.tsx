@@ -6,6 +6,11 @@ import Hero from './components/Hero';
 import DayCards from './components/DayCards';
 import HourlyChart from './components/HourlyChart';
 import ErrorPopup from './components/ErrorPopup';
+import Duel from './components/Duel';
+
+/** How far the page looks ahead. The server and the backtest keep the full 168 h; the cards, the
+ * curve and the duel widget show the first DAYS_SHOWN days of it. */
+const DAYS_SHOWN = 5;
 
 const LS_CITY = 'fw.city';
 const LS_SOURCE = 'fw.source';
@@ -113,7 +118,7 @@ export default function App() {
       <header className="top">
         <div className="brand">
           <span className="name">FutureWeather</span>
-          <span className="tag">Sieben Tage aus der Historie allein · TimesFM 3.0 gegen ein Wettermodell</span>
+          <span className="tag">{DAYS_SHOWN} Tage aus der Historie allein · TimesFM 3.0 gegen ein Wettermodell</span>
         </div>
         <Search onPick={pick} />
         <div className="topRight">
@@ -143,16 +148,22 @@ export default function App() {
       ) : data ? (
         <>
           <div className={`heroRow${loading ? ' skeleton' : ''}`}>
-            <Hero data={data} source={source} onSource={setSource} onChip={() => setPopup(true)} />
-            <DayCards data={data} source={source} selected={selected} onSelect={setSelected} />
+            <Hero data={data} source={source} onSource={setSource} onChip={() => setPopup(true)} days={DAYS_SHOWN} />
+            <DayCards data={data} source={source} selected={selected} onSelect={setSelected} days={DAYS_SHOWN} />
+            <Duel err={data.expectedError} hind={data.hindcast} days={DAYS_SHOWN} source={source} onOpen={() => setPopup(true)} />
           </div>
-          <section className={`raised chartPanel${loading ? ' skeleton' : ''}`} aria-label="Stundenkurve">
+          <section className={`chartPanel${loading ? ' skeleton' : ''}`} aria-label="Stundenkurve">
             <div className="chartHead">
-              <span className="label">Stündliche Temperatur · 14 Tage zurück, 7 Tage voraus</span>
+              <span className="label">Stündliche Temperatur · 14 Tage zurück, {DAYS_SHOWN} Tage voraus</span>
               <div className="legend">
                 <span>
-                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> gemessen (ERA5 / Analyse)
+                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> gemessen
                 </span>
+                {data.hindcast && (
+                  <span title={`${data.hindcast.runs} Läufe à ${data.hindcastDays} Tage, gestartet am ${data.hindcast.origins.map((o) => o.slice(5, 10)).join(', ')}`}>
+                    <i className="swatch dashed" style={{ color: 'var(--muted)' }} /> damals vorhergesagt
+                  </span>
+                )}
                 {source !== 'nwp' && (
                   <span>
                     <i className="swatch" style={{ color: 'var(--c-timesfm)' }} /> TimesFM 3.0 <i className="swatch band" /> 10–90 %
@@ -165,7 +176,7 @@ export default function App() {
                 )}
               </div>
             </div>
-            <HourlyChart data={data} source={source} selectedDay={selected} />
+            <HourlyChart data={data} source={source} selectedDay={selected} days={DAYS_SHOWN} />
           </section>
           {popup && <ErrorPopup err={data.expectedError} source={source} onClose={() => setPopup(false)} />}
         </>

@@ -30,12 +30,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import torch_compat  # noqa: E402,F401
+from nwp import assemble, load_nwp  # noqa: E402
 from openmeteo import CITIES, COLS, HOURLY_VARS, archive, forecast, geocode  # noqa: E402
 from symbols import CLASSES, RAIN_DAY_MM, class_from_code_block, code_to_class, symbol_from_means  # noqa: E402
 import models_timesfm  # noqa: E402
 
 HORIZON = 168
 HISTORY = 336
+HINDCAST_DAYS = 5   # horizon of one past run, matching what the page shows ahead
+HINDCAST_RUNS = 3   # chained past runs, so the whole 14-day history is covered
 CONTEXT = models_timesfm.CONTEXT
 BACKTEST = os.path.join(ROOT, "public", "data", "backtest.json")
 
@@ -148,6 +151,46 @@ def daily_cards(obs: pd.DataFrame, fc: pd.DataFrame, precip_q: np.ndarray | None
     return out
 
 
+def usable_context(past: pd.DataFrame) -> pd.DataFrame:
+    """The real observations at the end of `past`, at most CONTEXT hours.
+
+    Open-Meteo's forecast endpoint accepts past_days=92 but does not always hold that much: for
+    Berlin the oldest ~34 days come back empty. Back-filling them would feed TimesFM a flat line
+    a month long, so the leading empty block is dropped and only interior gaps are interpolated.
+    """
+    first = past["temp"].first_valid_index()
+    past = past.loc[first:] if first is not None else past
+    return past.tail(CONTEXT).interpolate(limit_direction="both")
+
+
+def nwp_hindcast(lat: float, lon: float, cutoff: pd.Timestamp, horizon: int) -> list | None:
+    """What the weather model, run `k` days before each hour, predicted for the hindcast window."""
+    start = (cutoff - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    end = (cutoff + pd.Timedelta(hours=horizon) + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    try:
+        df = load_nwp_at(lat, lon, start, end)
+    except Exception as e:  # previous-runs is a separate service; the page works without it
+        print(f"   previous-runs unavailable: {e!r}", flush=True)
+        return None
+    vals = assemble(df, "temp", cutoff, horizon)
+    return None if not np.isfinite(vals).any() else r1(vals)
+
+
+def load_nwp_at(lat: float, lon: float, start: str, end: str):
+    """load_nwp() takes a city name; the page needs arbitrary coordinates."""
+    import nwp as nwp_mod
+
+    saved = nwp_mod.CITIES.get("__live__")
+    nwp_mod.CITIES["__live__"] = (lat, lon)
+    try:
+        return load_nwp("__live__", start, end, ["temp"])
+    finally:
+        if saved is None:
+            nwp_mod.CITIES.pop("__live__", None)
+        else:
+            nwp_mod.CITIES["__live__"] = saved
+
+
 @app.get("/api/geocode")
 def api_geocode(q: str = Query(min_length=1)):
     hits = geocode(q, count=6)
@@ -169,18 +212,71 @@ def api_forecast(lat: float, lon: float, name: str | None = None, country: str |
     cutoff = now_local + pd.Timedelta(hours=1)
     if cutoff not in df.index or len(df.loc[: cutoff - pd.Timedelta(hours=1)]) < 24 * 30:
         raise HTTPException(502, "not enough history from Open-Meteo")
-    hist = df.loc[: cutoff - pd.Timedelta(hours=1)].tail(CONTEXT)
     fut = df.loc[cutoff:].head(HORIZON)
     if len(fut) < HORIZON:
         raise HTTPException(502, "NWP horizon incomplete")
-    for c in COLS:
-        hist[c] = hist[c].interpolate(limit_direction="both")
+    hist = usable_context(df.loc[: cutoff - pd.Timedelta(hours=1)])
     ts = fut.index
-    # TimesFM: 6-variate context (temp, rh, precip, cloud, wind, pressure)
-    hist_dict = {c: hist[c].to_numpy() for c in COLS}
-    out = models_timesfm.timesfm_multi([hist_dict], HORIZON, [{"cutoff": cutoff}])[0]
+    # TimesFM: 6-variate context (temp, rh, precip, cloud, wind, pressure).
+    # Two runs in one batch: the live forecast, and the same thing started HINDCAST_DAYS ago, whose
+    # outcome is already known - that is what the page draws over the history.
+    hind_h = HINDCAST_DAYS * 24
+    origins = [cutoff - pd.Timedelta(hours=hind_h * (k + 1)) for k in range(HINDCAST_RUNS)][::-1]
+    past = [(o, usable_context(df.loc[: o - pd.Timedelta(hours=1)])) for o in origins]
+    past = [(o, h) for o, h in past if len(h) >= 24 * 30]
+    # every context in a batch must be equally long: a ragged multivariate batch comes back all-NaN
+    n_ctx = min([len(hist)] + [len(h) for _, h in past])
+    cuts = [cutoff] + [o for o, _ in past]
+    contexts = [{c: h[c].to_numpy()[-n_ctx:] for c in COLS} for h in [hist] + [h for _, h in past]]
+    runs = models_timesfm.timesfm_multi(contexts, HORIZON, [{"cutoff": c} for c in cuts])
+    out = runs[0]
     tf_df = pd.DataFrame({v: out[v]["mean"] for v in ("temp", "rh", "precip", "cloud", "wind")}, index=ts)
     history = hist.tail(HISTORY)
+
+    # ---- hindcast: the same forecast, started HINDCAST_RUNS times in the past and chained, so the
+    # whole history is covered by runs whose outcome is now known
+    hindcast = None
+    if past:
+        hts = past[0][0] + pd.to_timedelta(np.arange(hind_h * len(past)), "h")
+        truth = df["temp"].reindex(hts).to_numpy()
+        tf_hind = np.concatenate([np.asarray(runs[i + 1]["temp"]["mean"][:hind_h], dtype=float) for i in range(len(past))])
+        q10 = np.concatenate([np.asarray(runs[i + 1]["temp"]["q10"][:hind_h], dtype=float) for i in range(len(past))])
+        q90 = np.concatenate([np.asarray(runs[i + 1]["temp"]["q90"][:hind_h], dtype=float) for i in range(len(past))])
+        nwp_parts = [nwp_hindcast(lat, lon, o, hind_h) for o, _ in past]
+        nwp_arr = (np.concatenate([np.asarray(p, dtype=float) for p in nwp_parts])
+                   if all(p is not None for p in nwp_parts) else None)
+
+        def mae(pred, sl=slice(None), need=24):
+            if pred is None:
+                return None
+            p, t = pred[sl], truth[sl]
+            ok = np.isfinite(p) & np.isfinite(t)
+            return round(float(np.abs(p[ok] - t[ok]).mean()), 2) if ok.sum() >= need else None
+
+        # mean error per lead day, pooled over the runs
+        def lead_day(pred, d):
+            if pred is None:
+                return None
+            idx = np.concatenate([np.arange(24 * d, 24 * (d + 1)) + hind_h * i for i in range(len(past))])
+            p, t = pred[idx], truth[idx]
+            ok = np.isfinite(p) & np.isfinite(t)
+            return round(float(np.abs(p[ok] - t[ok]).mean()), 2) if ok.sum() >= 12 else None
+
+        ok = np.isfinite(truth)
+        hindcast = {
+            "cutoff": past[0][0].strftime("%Y-%m-%dT%H:%M"),
+            "origins": [o.strftime("%Y-%m-%dT%H:%M") for o, _ in past],
+            "runs": len(past),
+            "ts": [t.strftime("%Y-%m-%dT%H:%M") for t in hts],
+            "timesfm": {"mean": r1(tf_hind), "q10": r1(q10), "q90": r1(q90)},
+            "nwp": r1(nwp_arr) if nwp_arr is not None else None,
+            "truth": r1(truth),
+            "mae": {"timesfm": mae(tf_hind), "nwp": mae(nwp_arr)},
+            "maeByDay": {"timesfm": [lead_day(tf_hind, d) for d in range(HINDCAST_DAYS)],
+                         "nwp": [lead_day(nwp_arr, d) for d in range(HINDCAST_DAYS)] if nwp_arr is not None else None},
+            "coverage80": (round(float(((truth[ok] >= q10[ok]) & (truth[ok] <= q90[ok])).mean()), 2)
+                           if ok.sum() >= hind_h // 2 else None),
+        }
     obs_today = hist[hist.index >= cutoff.normalize()]
     closest = closest_city(lat, lon)
     res = {
@@ -199,10 +295,12 @@ def api_forecast(lat: float, lon: float, name: str | None = None, country: str |
         "daily": {"timesfm": daily_cards(obs_today, tf_df, out["precip"]["q"]),
                   "nwp": daily_cards(obs_today, fut[["temp", "rh", "precip", "cloud", "wind", "code"]], None)},
         "history": {"ts": [t.strftime("%Y-%m-%dT%H:%M") for t in history.index], "temp": r1(history["temp"].to_numpy())},
+        "hindcast": hindcast,
         "expectedError": expected_error(closest),
-        "contextHours": int(len(hist)),
+        "contextHours": int(n_ctx),
     }
     res["runtimeMs"] = int((time.time() - t0) * 1000)
+    res["hindcastDays"] = HINDCAST_DAYS
     _cache[key] = res
     return res
 

@@ -16,6 +16,7 @@
   --c-truth: #3d4452;
   --c-history: #7c8595;
   --focus: #2a63c9;
+  --focus-soft: rgba(42, 99, 201, 0.28);
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
   --r-lg: 28px;
   --r-md: 20px;
@@ -44,6 +45,7 @@
     --c-truth: #eef1f6;
     --c-history: #8f98a8;
     --focus: #86adff;
+    --focus-soft: rgba(134, 173, 255, 0.3);
   }
 }
 
@@ -64,6 +66,7 @@
   --c-truth: #eef1f6;
   --c-history: #8f98a8;
   --focus: #86adff;
+  --focus-soft: rgba(134, 173, 255, 0.3);
 }
 
 * {
@@ -210,11 +213,15 @@ button {
 
 .searchPill input {
   flex: 1;
+  min-width: 0;
+  height: 32px;
   border: none;
   background: transparent;
   color: var(--text);
   font-size: 15px;
+  line-height: 32px;
   font-weight: 400;
+  caret-color: var(--focus);
 }
 
 .searchPill input::placeholder {
@@ -225,9 +232,14 @@ button {
   outline: none;
 }
 
+/* A text input matches :focus-visible even on a mouse click, so a hard outline would show on
+   every click. A soft halo that hugs the pill stays visible without looking like a border. */
 .searchPill:focus-within {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
+  box-shadow: var(--sunken), 0 0 0 3px var(--focus-soft);
+}
+
+.searchPill:focus-within svg {
+  color: var(--focus);
 }
 
 .suggest {
@@ -254,6 +266,16 @@ button {
   color: var(--text);
 }
 
+.suggest .suggestHead {
+  padding: 4px 14px 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: default;
+}
+
 .suggest li .sub {
   color: var(--muted);
   font-size: 11.5px;
@@ -267,8 +289,8 @@ button {
 /* ---------- hero row ---------- */
 .heroRow {
   display: grid;
-  grid-template-columns: 430px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(340px, 380px) minmax(0, 1fr) 236px;
+  gap: 20px;
   align-items: stretch;
 }
 
@@ -277,6 +299,7 @@ button {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto auto;
+  align-content: space-between;
   gap: 6px 16px;
 }
 
@@ -303,7 +326,7 @@ button {
 }
 
 .hero .bigTemp {
-  font-size: 84px;
+  font-size: 76px;
   font-weight: 200;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -313,8 +336,8 @@ button {
 .hero .nowIcon {
   align-self: center;
   justify-self: end;
-  width: 84px;
-  height: 84px;
+  width: 76px;
+  height: 76px;
 }
 
 .hero .sentence {
@@ -380,19 +403,17 @@ button {
 /* ---------- day cards ---------- */
 .days {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .day {
-  padding: 14px 14px 12px;
+  padding: 15px 16px 14px;
   border-radius: var(--r-md);
   box-shadow: var(--raised);
   background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 4px;
   text-align: left;
   min-width: 0;
   transition: box-shadow 0.15s ease;
@@ -402,9 +423,17 @@ button {
   box-shadow: var(--sunken);
 }
 
+.day .head {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 11px;
+}
+
 .day .dow {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
 .day .date {
@@ -412,79 +441,88 @@ button {
   font-size: 11px;
 }
 
+/* one source: icon, big high / small low, rain - spread over the card */
+.day .single {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  border-top: 1px solid var(--grid);
+  padding-top: 14px;
+}
+
 .day .icon {
-  width: 44px;
-  height: 44px;
-  margin: 6px 0 2px;
+  width: 40px;
+  height: 40px;
+}
+
+.day .temps {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .day .hi {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .day .lo {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .day .rain {
   color: var(--text-2);
   font-size: 11.5px;
-  margin-top: 2px;
 }
 
-.day .row {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 5px;
-  padding: 5px 0 5px 6px;
-  margin-top: 6px;
-  font-size: 12.5px;
-  white-space: nowrap;
-  overflow: hidden;
+/* both sources: two equal rows, separated by a hairline, each headed by its colour */
+.day.split .row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  border-top: 1px solid var(--grid);
+  padding: 11px 0 2px;
+  min-width: 0;
 }
 
-.day .row .icon {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-  grid-row: 1 / 3;
+.day.split .row .src {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
-.day .row .src {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.day.split .row .icon {
+  width: 26px;
+  height: 26px;
 }
 
-.day .row .t {
-  font-weight: 500;
+.day.split .row .hi {
+  font-size: 20px;
 }
 
-.day .row .t small {
+.day.split .row .lo {
+  font-size: 12px;
+}
+
+.day.split .row .rain {
   color: var(--muted);
-  font-weight: 400;
-}
-
-.day .row .p {
-  color: var(--muted);
-  font-size: 10px;
-  white-space: nowrap;
-  grid-column: 2;
-  letter-spacing: -0.01em;
+  font-size: 11px;
 }
 
 /* ---------- chart panel ---------- */
 .chartPanel {
-  padding: 18px 22px 12px;
+  padding: 4px 10px 8px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 8px;
+  gap: 10px;
   min-height: 0;
 }
 
@@ -530,8 +568,9 @@ button {
   position: relative;
   height: 100%;
   min-height: 0;
-  border-radius: var(--r-md);
-  box-shadow: var(--sunken);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  box-shadow: var(--raised);
   overflow: hidden;
 }
 
@@ -752,4 +791,184 @@ button {
   opacity: 0.45;
   pointer-events: none;
   filter: saturate(0.4);
+}
+
+/* ---------- duel widget: the measured verdict ---------- */
+.duel {
+  padding: 15px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.duelHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.duelSub {
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--grid);
+}
+
+.verdict .who {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.verdict .factor {
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.verdict .over {
+  color: var(--muted);
+  font-size: 10.5px;
+  padding-bottom: 8px;
+}
+
+.duelRows {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+.duelRows li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+}
+
+.duelRows .d {
+  color: var(--muted);
+}
+
+.duelRows .track {
+  position: relative;
+  height: 7px;
+  border-radius: 999px;
+  box-shadow: var(--sunken-sm);
+  background: var(--bg);
+}
+
+.duelRows .track .mid {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--faint);
+}
+
+.duelRows .track .bar {
+  position: absolute;
+  top: 1.5px;
+  bottom: 1.5px;
+  border-radius: 999px;
+  min-width: 3px;
+}
+
+.duelRows .f {
+  text-align: right;
+  font-weight: 600;
+}
+
+.lastRun {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--grid);
+  font-size: 10.5px;
+}
+
+.lastRun .lrHead,
+.duelFoot .dfHead {
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding-bottom: 1px;
+}
+
+.lastRun .lrRow {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-2);
+}
+
+.lastRun .lrRow b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.lastRun .lrRow.win b {
+  font-size: 11.5px;
+}
+
+.lastRun .lrRow.win {
+  color: var(--text);
+}
+
+.duelFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 9px;
+  border-top: 1px solid var(--grid);
+  color: var(--text-2);
+  font-size: 10.5px;
+}
+
+.duelFoot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.duelMore {
+  align-self: flex-start;
+  padding: 5px 0 0;
+  color: var(--muted);
+  font-size: 10.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.duelMore:hover {
+  color: var(--text);
+}
+
+.duelNote {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.duelNote code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
 }

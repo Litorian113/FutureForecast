@@ -7,7 +7,20 @@ interface Props {
   onPick: (hit: GeoHit) => void;
 }
 
-/** Sunken search pill with a debounced (250 ms) geocoder suggestion list; arrow keys + Enter. */
+/** The seven backtest cities: shown as a quick pick when the field is focused but still empty,
+ * because for these the honesty chip has measured numbers of their own. */
+const QUICK: GeoHit[] = [
+  { name: 'Berlin', country: 'Deutschland', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' },
+  { name: 'Reykjavík', country: 'Island', admin1: null, lat: 64.1355, lon: -21.8954, tz: 'Atlantic/Reykjavik' },
+  { name: 'Phoenix', country: 'Vereinigte Staaten', admin1: 'Arizona', lat: 33.4484, lon: -112.074, tz: 'America/Phoenix' },
+  { name: 'Singapur', country: 'Singapur', admin1: null, lat: 1.2897, lon: 103.8501, tz: 'Asia/Singapore' },
+  { name: 'Kapstadt', country: 'Südafrika', admin1: 'Westkap', lat: -33.9258, lon: 18.4232, tz: 'Africa/Johannesburg' },
+  { name: 'Denver', country: 'Vereinigte Staaten', admin1: 'Colorado', lat: 39.7392, lon: -104.9847, tz: 'America/Denver' },
+  { name: 'Tokio', country: 'Japan', admin1: null, lat: 35.6895, lon: 139.6917, tz: 'Asia/Tokyo' },
+];
+
+/** Sunken search pill with a debounced (250 ms) geocoder list; arrow keys + Enter.
+ * Empty and focused it offers the backtest cities, so a click always shows something. */
 export default function Search({ onPick }: Props) {
   const [q, setQ] = useState('');
   const [hits, setHits] = useState<GeoHit[]>([]);
@@ -16,10 +29,13 @@ export default function Search({ onPick }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const seq = useRef(0);
 
+  const term = q.trim();
+  const list = term.length < 2 ? QUICK : hits;
+
   useEffect(() => {
-    const term = q.trim();
     if (term.length < 2) {
       setHits([]);
+      setActive(0);
       return;
     }
     const id = ++seq.current;
@@ -34,7 +50,7 @@ export default function Search({ onPick }: Props) {
         .catch(() => setHits([]));
     }, 250);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [term]);
 
   const pick = (h: GeoHit) => {
     onPick(h);
@@ -45,23 +61,25 @@ export default function Search({ onPick }: Props) {
   };
 
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!open || hits.length === 0) return;
+    if (e.key === 'Escape') {
+      setOpen(false);
+      return;
+    }
+    if (!open || list.length === 0) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActive((a) => (a + 1) % hits.length);
+      setActive((a) => (a + 1) % list.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActive((a) => (a - 1 + hits.length) % hits.length);
+      setActive((a) => (a - 1 + list.length) % list.length);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      pick(hits[active]);
-    } else if (e.key === 'Escape') {
-      setOpen(false);
+      pick(list[active]);
     }
   };
 
   return (
-    <div className="search" role="combobox" aria-expanded={open && hits.length > 0} aria-haspopup="listbox" aria-owns="citylist">
+    <div className="search" role="combobox" aria-expanded={open && list.length > 0} aria-haspopup="listbox" aria-owns="citylist">
       <div className="searchPill">
         <SearchGlyph />
         <input
@@ -72,14 +90,15 @@ export default function Search({ onPick }: Props) {
           aria-autocomplete="list"
           aria-controls="citylist"
           onChange={(e) => setQ(e.target.value)}
-          onFocus={() => hits.length && setOpen(true)}
+          onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           onKeyDown={onKey}
         />
       </div>
-      {open && hits.length > 0 && (
+      {open && list.length > 0 && (
         <ul className="suggest" id="citylist" role="listbox">
-          {hits.map((h, i) => (
+          {term.length < 2 && <li className="suggestHead">Städte mit eigenem Backtest</li>}
+          {list.map((h, i) => (
             <li
               key={`${h.lat},${h.lon}`}
               role="option"
