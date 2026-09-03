@@ -2,10 +2,8 @@
 
 # Future Lab
 
-**Can an AI model read the future from the past?**
-One model, three subjects, three honest answers.
-
-Earthquakes · Electricity · Weather, each measured against whatever is the standard there.
+**Three experiments with a time-series foundation model.**
+Earthquakes, electricity demand and weather, each compared with the method people normally use.
 
 [The site](#the-site) · [How it works](#how-it-works) · [Results](#the-results) · [What we learned](#what-we-learned) · [Open work](#open-work-and-known-issues) · [Run it yourself](#run-it-yourself) · [Data & licences](#data-and-licences)
 
@@ -19,16 +17,16 @@ Google released **TimesFM 3.0**, a model trained on billions of time series: sal
 web traffic, whatever. The idea: you hand it any series of numbers from the past and it predicts the next
 values. **No training, no tuning, no idea what the numbers mean.** That is called *zero-shot*.
 
-It sounds like magic. So we pointed it at three very different things and asked the same question each time:
-*Is this really better than what people do anyway?*
+I found that interesting and wanted to see what it does on data I had around. So I tried it on three very
+different things and compared it each time with the method people normally use.
 
 | | Scenario | The question | Opponent | Result |
 |---|---|---|---|---|
-| 01 | **Earthquakes** | Where does it shake next? | The frequency of the last 50 years | **A draw** |
-| 02 | **Electricity** | How much load does the grid draw tomorrow at 6 pm? | Classical statistics (Holt-Winters, STL) | **TimesFM wins** |
-| 03 | **Weather** | How warm will it be in five days? | A real weather model (ICON, ECMWF) | **The weather model wins** |
+| 01 | **Earthquakes** | How often will each region shake in the next ten years? | The frequency of the last 50 years | About the same as the long-term average |
+| 02 | **Electricity** | How much load will the grid draw next week, hour by hour? | Classical statistics (Holt-Winters, STL) | Clearly better than the classical methods |
+| 03 | **Weather** | How warm will it be in five days? | A real weather model (ICON, ECMWF) | Good for one day, then the weather model is 2–3× more accurate |
 
-The short explanation of why the answers differ so much is at the end. It is the actual finding of the project.
+Why the three came out so differently is explained at the end; that turned out to be the most interesting part.
 
 ## The site
 

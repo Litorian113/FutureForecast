@@ -32,7 +32,7 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
   if (!err || !err.byLead.nwp) {
     return (
       <section className="raised duel" aria-label="Model comparison">
-        <span className="label">Who wins?</span>
+        <span className="label">TimesFM vs. weather model</span>
         <p className="duelNote">
           No backtest for this place yet. Run <code>weather/backtest.py</code>.
         </p>
@@ -52,7 +52,7 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
   return (
     <section className="raised duel" aria-label="Model comparison">
       <div className="duelHead">
-        <span className="label">Who wins?</span>
+        <span className="label">TimesFM vs. weather model</span>
         <span className="duelSub">
           Backtest {err.city} {err.year} · {err.cutoffs} cutoffs
         </span>

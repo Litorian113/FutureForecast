@@ -151,16 +151,16 @@ function headline(
     lead,
     verdict: (
       <>
-        The foundation model wins{' '}
+        TimesFM had the lower error in{' '}
         <b>
           {winsVsBest} of {n} weeks
         </b>{' '}
-        against the best classical method, at <b>{pct}</b> {maeGain > 0 ? 'lower' : 'higher'} error.
+        compared with the best classical method, <b>{pct}</b> {maeGain > 0 ? 'lower' : 'higher'} over the whole period.
         {winsVsNaive != null && (
           <>
             {' '}
-            It beats “same hour last week” in {winsVsNaive} of {n}. Zero-shot: no training, no tuning, no
-            weather.
+            Against “same hour last week” it was ahead in {winsVsNaive} of {n}. No training, no tuning, no weather
+            data, only the load history.
           </>
         )}
       </>

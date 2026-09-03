@@ -5,43 +5,44 @@ export default function Hub() {
   return (
     <main className="hub">
       <header className="hubHead">
-        <h1>Can a foundation model forecast from the history alone?</h1>
+        <h1>Three experiments with a time-series foundation model</h1>
         <p>
-          Google <b>TimesFM 3.0</b>, zero-shot, no training, applied to three subjects and measured against the methods
-          that are standard there. The answers differ. Pick a scenario:
+          I tried Google's <b>TimesFM 3.0</b> on three things I had data for: earthquakes, electricity demand and the
+          weather. No training, just the past values of each series as input. Each time I compared it with the method
+          people normally use, to see where it helps and where it does not. Pick one:
         </p>
       </header>
 
       <nav className="tiles" aria-label="Scenarios">
         <a className="tile quake" href="./erdbeben.html">
           <span className="no">01 · Earthquakes</span>
-          <h2>Where does it shake next?</h2>
-          <p className="q">23,000 quakes of M 5.5+ since 1965 and the tsunamis they triggered. TimesFM forecasts the rate per 5° cell ten years ahead.</p>
+          <h2>Earthquakes since 1965</h2>
+          <p className="q">23,000 quakes of M 5.5+ and the tsunamis they triggered. I let TimesFM estimate how often each 5° cell shakes over the next ten years and checked it against the quakes of one month.</p>
           <QuakeArt />
           <p className="verdict">
-            <b>A draw.</b> 49 of 50 real quakes fell into a forecast cell, but the cell's own climatology hits just as well. The model adds level and trend, not new places.
+            <b>What came out:</b> about the same as the long-term average. 49 of 50 real quakes fell into a forecast cell, but the frequency of the last 50 years gets them just as well. The model adds level and trend, not new places.
           </p>
-          <span className="open">Open the 3D globe <i>→</i><small>USGS · NOAA · 1965–2016 · forecast 2017–2026</small></span>
+          <span className="open">Open the globe <i>→</i><small>USGS · NOAA · 1965–2016 · forecast 2017–2026</small></span>
         </a>
 
         <a className="tile grid" href="./strom.html">
           <span className="no">02 · Electricity</span>
-          <h2>How much load tomorrow at 6 pm?</h2>
-          <p className="q">Hourly grid load of the PJM region, a 104-week backtest, one week ahead, against seasonal naive, Holt-Winters and STL + ETS.</p>
+          <h2>Electricity demand, one week ahead</h2>
+          <p className="q">Hourly grid load of the PJM region in the US. 104 weeks, each forecast 168 hours ahead, next to seasonal naive, Holt-Winters and STL + ETS.</p>
           <GridArt />
           <p className="verdict">
-            <b>TimesFM wins.</b> 54 % lower error than the best classical model, ahead of the seasonal naive in 100 of 104 weeks. A year of context has seen last summer's heat wave.
+            <b>What came out:</b> clearly better than the classical methods. 54 % lower error than the best of them, ahead of the seasonal naive in 100 of 104 weeks. With a year of context it has seen last summer's heat wave.
           </p>
           <span className="open">Open the benchmark <i>→</i><small>PJM Interconnection · Kaggle · 2016–2018</small></span>
         </a>
 
         <a className="tile weather" href="./wetter.html">
           <span className="no">03 · Weather</span>
-          <h2>How warm in five days?</h2>
-          <p className="q">Hourly temperature for any city in the world, computed live, against persistence, climatology and a real weather model.</p>
+          <h2>Temperature, five days ahead</h2>
+          <p className="q">Hourly temperature for any city, computed live while you watch, next to persistence, climatology and a real weather model.</p>
           <WeatherArt />
           <p className="verdict">
-            <b>The weather model wins.</b> On day 1 TimesFM beats every trivial method; from day 3 it is down at climatology. The weather model is 2–3× more accurate: it sees the front, the time series does not.
+            <b>What came out:</b> good for one day, then not. On day 1 TimesFM is ahead of every simple method; from day 3 it is at the level of the long-term average. The weather model is 2–3× more accurate, because it sees the front coming and the time series does not.
           </p>
           <span className="open">Open the forecast <i>→</i><small>Open-Meteo · ERA5 · 7 cities · 1,281 cutoffs</small></span>
         </a>
