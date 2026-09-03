@@ -1,7 +1,7 @@
 // Headless-Chrome screenshot via the DevTools protocol (Node 22 has WebSocket built in).
 // Used to check the page visually. Copy this file into other projects as it is.
 // usage: node shot.mjs <url> <out.png> [actions-json]
-// actions: [{type:'click',sel:'…'},{type:'key',key:'ArrowRight'},{type:'hover',x,y},{type:'wait',ms},{type:'eval',js}]
+// actions: [{type:'click',sel:'…'},{type:'key',key:'ArrowRight'},{type:'hover',x,y},{type:'wheel',x,y,deltaY},{type:'wait',ms},{type:'eval',js}]
 import { spawn } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 const [url, out, actionsJson] = process.argv.slice(2);
@@ -35,6 +35,7 @@ for (const a of actions) {
   else if (a.type === 'click') { const r = await evalJs(`(()=>{const e=document.querySelector(${JSON.stringify(a.sel)});const b=e.getBoundingClientRect();return [b.x+b.width/2,b.y+b.height/2]})()`);
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: r[0], y: r[1], button: 'left', clickCount: 1 });
     await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r[0], y: r[1], button: 'left', clickCount: 1 }); await sleep(300); }
+  else if (a.type === 'wheel') { await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: a.x, y: a.y, deltaX: 0, deltaY: a.deltaY }); await sleep(a.ms ?? 600); }
   else if (a.type === 'hover') { await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: a.x, y: a.y }); await sleep(300); }
   else if (a.type === 'key') { await send('Input.dispatchKeyEvent', { type: 'keyDown', key: a.key, code: a.key, windowsVirtualKeyCode: a.key === 'ArrowRight' ? 39 : a.key === 'ArrowLeft' ? 37 : 32 }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: a.key }); await sleep(300); }
 }

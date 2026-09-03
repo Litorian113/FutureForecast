@@ -337,6 +337,67 @@ export default function Globe() {
     controls.minDistance = RADIUS + 0.5;
     controls.maxDistance = 40;
 
+    // ---- space around the globe: two layers of slowly drifting stars and an additive rim glow.
+    // A black core sphere makes the globe opaque, so stars and far-side dots do not shine through the ocean.
+    const space = new THREE.Group();
+    // round, soft star sprite (PointsMaterial draws squares otherwise)
+    const starCanvas = document.createElement('canvas');
+    starCanvas.width = starCanvas.height = 64;
+    const sctx = starCanvas.getContext('2d')!;
+    const grad = sctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.35, 'rgba(255,255,255,0.55)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    sctx.fillStyle = grad;
+    sctx.fillRect(0, 0, 64, 64);
+    const starSprite = new THREE.CanvasTexture(starCanvas);
+    const makeStars = (n: number, rMin: number, rMax: number, size: number, color: number, opacity: number) => {
+      const pos = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        const u = Math.random() * 2 - 1;
+        const t = Math.random() * Math.PI * 2;
+        const r = rMin + Math.random() * (rMax - rMin);
+        const k = Math.sqrt(1 - u * u);
+        pos[i * 3] = r * k * Math.cos(t);
+        pos[i * 3 + 1] = r * u;
+        pos[i * 3 + 2] = r * k * Math.sin(t);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const mat = new THREE.PointsMaterial({
+        size,
+        color,
+        map: starSprite,
+        transparent: true,
+        opacity,
+        sizeAttenuation: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      return new THREE.Points(geo, mat);
+    };
+    space.add(makeStars(3000, 70, 140, 0.55, 0xffffff, 0.55));
+    space.add(makeStars(320, 60, 130, 1.3, 0xc4d2ff, 0.9));
+    scene.add(space);
+
+    const glowMaterial = new THREE.ShaderMaterial({
+      uniforms: { color: { value: new THREE.Color(0x7d8ee8) } },
+      vertexShader: 'varying vec3 vN; void main() { vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader:
+        'uniform vec3 color; varying vec3 vN; void main() { float rim = 1.0 - abs(dot(vN, vec3(0.0, 0.0, 1.0))); float i = pow(rim, 2.6) * 2.2; gl_FragColor = vec4(color * i, i); }',
+      blending: THREE.AdditiveBlending,
+      side: THREE.FrontSide,
+      transparent: true,
+      depthWrite: false,
+    });
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.16, 64, 64), glowMaterial);
+    glow.renderOrder = -3;
+    scene.add(glow);
+
+    const core = new THREE.Mesh(new THREE.SphereGeometry(RADIUS - 0.04, 64, 64), new THREE.MeshBasicMaterial({ color: new THREE.Color(COLORS.bg) }));
+    core.renderOrder = -2;
+    scene.add(core);
+
     const globe = new THREE.Group();
     const sphere = new THREE.Points(new THREE.SphereGeometry(RADIUS, 64, 64), new THREE.PointsMaterial({ color: GLOBE_COLOR, size: GLOBE_POINT_SIZE }));
     globe.add(sphere);
@@ -482,6 +543,8 @@ export default function Globe() {
     let frame = 0;
     const animate = () => {
       frame = requestAnimationFrame(animate);
+      space.rotation.y += 0.00035;
+      space.rotation.x += 0.00008;
       flyTowardsFocus();
       controls.update();
       pick();
@@ -520,6 +583,16 @@ export default function Globe() {
           (o.material as THREE.Material).dispose();
         }
       });
+      space.children.forEach((o) => {
+        const pts = o as THREE.Points;
+        pts.geometry.dispose();
+        (pts.material as THREE.Material).dispose();
+      });
+      glow.geometry.dispose();
+      glowMaterial.dispose();
+      starSprite.dispose();
+      core.geometry.dispose();
+      (core.material as THREE.Material).dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
       histMaterialsRef.current = [];
