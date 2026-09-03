@@ -170,7 +170,7 @@ Voraussetzungen: Node 22, Python 3.12, [uv](https://docs.astral.sh/uv/). Die Tim
 erste Lauf automatisch von Hugging Face.
 
 ```bash
-git clone https://github.com/Litorian113/FutureWeather.git && cd FutureWeather
+git clone https://github.com/Litorian113/FutureForecast.git && cd FutureWeather
 npm install
 uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requirements.txt
 
