@@ -622,36 +622,46 @@ export default function Globe() {
 
       {data?.forecast && insights && (panelOpen ? (
         <aside className="globePanel">
-          <div className="control panelHeader">
-            <span>
-              <b>Predictions</b>
-              <span className="muted"> · TimesFM 3.0</span>
-            </span>
-            <button type="button" className="ghostBtn" onClick={() => setPanelOpen(false)} aria-label="Hide panel">
-              hide ›
+          <div className="panelHead">
+            <div>
+              <div className="panelTitle">Predictions</div>
+              <div className="panelSub">TimesFM 3.0 · {data.forecast.meta.years[0]}–{insights.lastYear}</div>
+            </div>
+            <button type="button" className="iconBtn" onClick={() => setPanelOpen(false)} aria-label="Hide panel" title="Hide panel">
+              ×
             </button>
           </div>
-          <div className="control">
-            <span>Show predicted {data.forecast.meta.years[0]}–{insights.lastYear}</span>
-            <label className="switch small">
-              <input type="checkbox" checked={showForecast} onChange={(e) => setShowForecast(e.target.checked)} aria-label="Show predictions" />
-              <span className="knob" />
+
+          <div className="controls">
+            <label className="ctrl">
+              <span className="ctrlLabel">Predicted quakes</span>
+              <span className="switch small">
+                <input type="checkbox" checked={showForecast} onChange={(e) => setShowForecast(e.target.checked)} aria-label="Show predictions" />
+                <span className="knob" />
+              </span>
             </label>
-          </div>
-          <label className="control">
-            <span>
-              Historical quakes
-              <span className="muted"> · {Math.round(histOpacity * 100)}%</span>
-            </span>
-            <input type="range" min={0} max={100} value={Math.round(histOpacity * 100)} onChange={(e) => setHistOpacity(Number(e.target.value) / 100)} aria-label="Historical quakes opacity" />
-          </label>
-          <div>
-            <div className="gradientBar" />
-            <div className="gradientLabels">
-              <span>M 5.5 predicted</span>
-              <span>M 8+</span>
+            <label className="ctrl">
+              <span className="ctrlLabel">History</span>
+              <span className="ctrlRange">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(histOpacity * 100)}
+                  style={{ '--pct': `${Math.round(histOpacity * 100)}%` } as React.CSSProperties}
+                  onChange={(e) => setHistOpacity(Number(e.target.value) / 100)}
+                  aria-label="Historical quakes opacity"
+                />
+                <span className="ctrlValue">{Math.round(histOpacity * 100)} %</span>
+              </span>
+            </label>
+            <div className="legendRow">
+              <span className="legendLabel">M 5.5</span>
+              <span className="gradientBar" />
+              <span className="legendLabel">M 8+</span>
             </div>
           </div>
+
           <div className="tabs" role="tablist" aria-label="Prediction lists">
             {insights.sections.map((sec) => (
               <button

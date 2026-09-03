@@ -1571,3 +1571,156 @@ select {
     gap: 2px;
   }
 }
+
+/* ==================== globe panel v2: head + controls ==================== */
+.globePanel .panelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.globePanel .panelTitle {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.globePanel .panelSub {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.globePanel .iconBtn {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.globePanel .iconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+/* one quiet card for the two controls and the legend */
+.globePanel .controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.globePanel .ctrl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 38px;
+  cursor: pointer;
+}
+
+.globePanel .ctrl + .ctrl,
+.globePanel .legendRow {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.globePanel .ctrlLabel {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.globePanel .ctrlRange {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.globePanel .ctrlValue {
+  min-width: 38px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* switch in the page's green */
+.globePanel .switch.small {
+  width: 38px;
+  height: 22px;
+}
+
+.globePanel .switch.small .knob {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.globePanel .switch.small .knob::before {
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+}
+
+.globePanel .switch.small input:checked + .knob {
+  background: var(--forecast);
+}
+
+.globePanel .switch.small input:checked + .knob::before {
+  transform: translateX(16px);
+  background: #0b1a12;
+}
+
+/* slider: filled track up to the value, small thumb */
+.globePanel input[type='range'] {
+  width: 120px;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--forecast) 0 var(--pct, 100%), rgba(255, 255, 255, 0.16) var(--pct, 100%) 100%);
+}
+
+.globePanel input[type='range']::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 2px solid #1a1a24;
+}
+
+.globePanel input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid #1a1a24;
+}
+
+.globePanel .legendRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+}
+
+.globePanel .legendRow .gradientBar {
+  height: 6px;
+  border-radius: 3px;
+}
+
+.globePanel .legendLabel {
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
