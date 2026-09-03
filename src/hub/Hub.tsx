@@ -97,8 +97,8 @@ function QuakeArt() {
   };
   const r = rng(11);
   const dots: { x: number; y: number; z: number }[] = [];
-  for (let lat = -84; lat <= 84; lat += 6) {
-    const step = 6 / Math.max(0.25, Math.cos(lat * rad));
+  for (let lat = -85; lat <= 85; lat += 5) {
+    const step = 5 / Math.max(0.25, Math.cos(lat * rad));
     for (let lon = -180; lon < 180; lon += step) {
       const p = project(lat, lon);
       if (p.z > 0.05) dots.push(p);
@@ -127,7 +127,7 @@ function QuakeArt() {
       <g clipPath="url(#globeClip)">
         <circle cx={CX} cy={CY} r={R} fill="rgb(24, 24, 36)" />
         {dots.map((p, i) => (
-          <circle key={`d${i}`} cx={p.x} cy={p.y} r={0.9} fill="#6e6d95" opacity={0.25 + p.z * 0.5} />
+          <circle key={`d${i}`} cx={p.x} cy={p.y} r={1} fill="#6e6d95" opacity={0.35 + p.z * 0.55} />
         ))}
         {quakes.map((p, i) =>
           p.fc ? (
