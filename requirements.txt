@@ -1,0 +1,9 @@
+# Python >= 3.10. On Intel macOS the newest available torch is 2.2.2, which needs numpy < 2
+# and lacks torch.nn.RMSNorm (see weather/torch_compat.py).
+timesfm[torch]==3.0.1
+numpy<2
+pandas
+statsmodels
+httpx
+fastapi
+uvicorn

@@ -1,0 +1,8 @@
+node_modules
+dist
+.venv
+__pycache__
+weather/data/cache
+weather/data/*.csv
+*.png
+!docs/*.png
