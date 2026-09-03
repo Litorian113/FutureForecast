@@ -94,6 +94,8 @@ select {
 .topbar .back {
   color: var(--muted);
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .topbar .back:hover {
@@ -1296,4 +1298,276 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ==================== globe panel v2: tabs, flat list, pinned detail ==================== */
+.globePanel {
+  width: 348px;
+  padding: 14px 16px 12px;
+  gap: 12px;
+  font-size: 12px;
+  background: rgba(24, 24, 34, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.globePanel .panelHeader {
+  margin-bottom: 0;
+}
+
+.globePanel .control {
+  font-size: 12px;
+}
+
+.globePanel .tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.globePanel .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.globePanel .tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.globePanel .tab .n {
+  font-size: 10px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.globePanel .tab:hover {
+  color: var(--text);
+}
+
+.globePanel .tab.on {
+  color: var(--text);
+  border-bottom-color: var(--forecast);
+}
+
+.globePanel .tab.on .n {
+  color: var(--forecast);
+  opacity: 1;
+}
+
+.globePanel .secHint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+
+.globePanel .list {
+  flex: 1;
+  min-height: 120px;
+  overflow-y: auto;
+  gap: 0;
+  margin: 0 -6px;
+  padding: 0 6px;
+  scrollbar-width: thin;
+}
+
+.globePanel .item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 6px;
+  border: none;
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.globePanel .item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: none;
+}
+
+.globePanel .item.selected {
+  background: rgba(61, 220, 132, 0.09);
+  border-left-color: var(--forecast);
+}
+
+.globePanel .item .mag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 0;
+  border: 1px solid;
+  border-radius: 6px;
+  background: transparent;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.globePanel .item .placeName {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.globePanel .item .detailLine {
+  color: var(--muted);
+  font-size: 10.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.globePanel .item .when {
+  font-size: 10.5px;
+}
+
+.globePanel .empty {
+  color: var(--muted);
+  padding: 12px 4px;
+}
+
+.globePanel .detail {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.globePanel .detailHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.globePanel .detailTitle {
+  font-weight: 600;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.globePanel .stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.globePanel .stepper .ghostBtn {
+  padding: 2px 8px;
+}
+
+.globePanel .facts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+}
+
+.globePanel .facts > div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.globePanel .facts dt {
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.globePanel .facts dd {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.globePanel .note {
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+
+/* ---------- responsive: the panel becomes a bottom sheet, the title bar shrinks ---------- */
+@media (max-width: 900px) {
+  .globePanel {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-width: none;
+    max-height: 56vh;
+    border-radius: 14px;
+    animation: none;
+  }
+
+  .globePanel .list {
+    min-height: 80px;
+  }
+
+  .globePanelToggle {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .pairCallout {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0 14px;
+    gap: 14px;
+  }
+
+  .topbar .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .globePanel {
+    padding: 12px 12px 10px;
+    max-height: 60vh;
+  }
+
+  .globePanel .item {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .globePanel .facts > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }

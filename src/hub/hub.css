@@ -280,3 +280,44 @@ body {
     min-height: 120px;
   }
 }
+
+@media (max-width: 640px) {
+  .hub {
+    padding: 22px 18px 18px;
+    gap: 18px;
+  }
+
+  .hubHead h1 {
+    font-size: 26px;
+  }
+
+  .hubHead p {
+    font-size: 14px;
+  }
+
+  .tile {
+    padding: 20px 18px 18px;
+  }
+
+  .tile h2 {
+    font-size: 21px;
+  }
+
+  .tile .art {
+    min-height: 110px;
+  }
+
+  .wtemp {
+    font-size: 60px;
+  }
+
+  .wsun {
+    width: 56px;
+    height: 56px;
+  }
+
+  .hubFoot {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

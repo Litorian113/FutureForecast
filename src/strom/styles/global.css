@@ -990,3 +990,82 @@ button {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ==================== responsive ==================== */
+@media (max-width: 1100px) {
+  .frame {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 20px 20px 16px;
+  }
+
+  .main {
+    align-items: start;
+    gap: 18px;
+  }
+
+  .main > .stack,
+  .main > .sideCol {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .centerCol > .chartWrap {
+    height: 360px;
+  }
+
+  .corner {
+    gap: 12px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 6px;
+  }
+
+  .panel {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .frame {
+    padding: 14px 14px 14px;
+  }
+
+  .corner {
+    flex-direction: column;
+  }
+
+  .corner .right {
+    text-align: left;
+  }
+
+  .centerCol > .chartWrap {
+    height: 300px;
+  }
+
+  .toolbar .sepv {
+    display: none;
+  }
+
+  .toolbar {
+    gap: 8px 12px;
+    font-size: 12px;
+  }
+
+  .miniRow {
+    grid-template-columns: 1fr;
+  }
+
+  .main .lead .leadFirst {
+    font-size: 14px;
+  }
+}

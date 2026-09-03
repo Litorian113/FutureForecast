@@ -605,70 +605,15 @@ export default function Globe() {
 
   if (error) return <div className="errorBox">{error}</div>;
 
-  const renderSection = (sec: Section) => {
-    const open = openSection === sec.key;
-    const idx = sec.items.findIndex((it) => it.key === selected);
-    return (
-      <section key={sec.key} className={`accordion${open ? ' open' : ''}`}>
-        <button type="button" className="accordionHeader" onClick={() => setOpenSection(open ? '' : sec.key)} aria-expanded={open}>
-          <span className="chevron">{open ? '▾' : '▸'}</span>
-          <span className="accordionTitle">{sec.title}</span>
-          <span className="count">{sec.items.length}</span>
-        </button>
-        {open && (
-          <>
-            <div className="accordionHint">
-              <span className="muted">{sec.hint}</span>
-              <span className="stepper">
-                <button type="button" className="ghostBtn" onClick={() => step(-1)} aria-label="Previous">
-                  ‹
-                </button>
-                <span className="muted">{idx >= 0 ? `${idx + 1} / ${sec.items.length}` : `${sec.items.length}`}</span>
-                <button type="button" className="ghostBtn" onClick={() => step(1)} aria-label="Next">
-                  ›
-                </button>
-              </span>
-            </div>
-            <div className="list">
-              {sec.items.map((it) => {
-                const isSel = selected === it.key;
-                return (
-                  <div key={it.key} className={`entry${isSel ? ' selected' : ''}`}>
-                    <button type="button" className={`item${isSel ? ' selected' : ''}`} onClick={() => (isSel ? clearSelection() : focusOn(it))}>
-                      <span className="mag" style={{ background: it.badgeColor }}>
-                        {it.badge}
-                      </span>
-                      <span className="place">
-                        <span className="placeName">{it.place}</span>
-                        <span className="muted">{it.detail}</span>
-                      </span>
-                      <span className="when">{it.when}</span>
-                    </button>
-                    {isSel && (
-                      <dl className="facts">
-                        {it.pair && (
-                          <div className="pairLegend">
-                            <span><span className="ring white" /> real quake</span>
-                            <span><span className="ring green" /> predicted dot</span>
-                          </div>
-                        )}
-                        {it.facts.map((f) => (
-                          <div key={f.label}>
-                            <dt>{f.label}</dt>
-                            <dd>{f.value}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </section>
-    );
+  const TAB_LABEL: Record<string, string> = {
+    pairs: 'Real vs. predicted',
+    upcoming: 'Coming up',
+    strongest: 'Strongest',
+    active: 'Most active',
+    rising: 'Rising',
   };
+  const selectedItem = currentSection?.items.find((it) => it.key === selected) ?? null;
+  const selectedIdx = currentSection && selectedItem ? currentSection.items.indexOf(selectedItem) : -1;
 
   return (
     <div className="page">
@@ -707,12 +652,99 @@ export default function Globe() {
               <span>M 8+</span>
             </div>
           </div>
-          <div className="muted">
-            Green dots are sampled from the forecast rates. TimesFM predicts <i>how many</i> quakes a region gets; each dot's magnitude is drawn from that
-            region's own history. "Strongest" therefore means where the biggest quakes are expected to recur, not a specific event.
+          <div className="tabs" role="tablist" aria-label="Prediction lists">
+            {insights.sections.map((sec) => (
+              <button
+                key={sec.key}
+                type="button"
+                role="tab"
+                aria-selected={openSection === sec.key}
+                className={`tab${openSection === sec.key ? ' on' : ''}`}
+                onClick={() => setOpenSection(sec.key)}
+              >
+                {TAB_LABEL[sec.key] ?? sec.title}
+                <span className="n">{sec.items.length}</span>
+              </button>
+            ))}
           </div>
-          <div className="accordions">{insights.sections.map(renderSection)}</div>
-          <div className="muted">Click an entry for details and to turn the globe there · ↑ ↓ step through the open list.</div>
+
+          {currentSection && (
+            <>
+              <div className="secHint">
+                <span>{currentSection.hint}</span>
+              </div>
+              <div className="list" role="listbox" aria-label={currentSection.title}>
+                {currentSection.items.map((it) => {
+                  const isSel = selected === it.key;
+                  return (
+                    <button
+                      key={it.key}
+                      type="button"
+                      role="option"
+                      aria-selected={isSel}
+                      className={`item${isSel ? ' selected' : ''}`}
+                      onClick={() => (isSel ? clearSelection() : focusOn(it))}
+                    >
+                      <span className="mag" style={{ color: it.badgeColor, borderColor: it.badgeColor }}>
+                        {it.badge}
+                      </span>
+                      <span className="place">
+                        <span className="placeName">{it.place}</span>
+                        <span className="detailLine">{it.detail}</span>
+                      </span>
+                      <span className="when">{it.when}</span>
+                    </button>
+                  );
+                })}
+                {currentSection.items.length === 0 && <div className="empty">Nothing to show here.</div>}
+              </div>
+            </>
+          )}
+
+          {selectedItem && currentSection && (
+            <div className="detail" aria-live="polite">
+              <div className="detailHead">
+                <span className="detailTitle">{selectedItem.place}</span>
+                <span className="stepper">
+                  <button type="button" className="ghostBtn" onClick={() => step(-1)} aria-label="Previous">
+                    ‹
+                  </button>
+                  <span>
+                    {selectedIdx + 1} / {currentSection.items.length}
+                  </span>
+                  <button type="button" className="ghostBtn" onClick={() => step(1)} aria-label="Next">
+                    ›
+                  </button>
+                  <button type="button" className="ghostBtn" onClick={clearSelection} aria-label="Clear selection">
+                    ×
+                  </button>
+                </span>
+              </div>
+              {selectedItem.pair && (
+                <div className="pairLegend">
+                  <span>
+                    <span className="ring white" /> real quake
+                  </span>
+                  <span>
+                    <span className="ring green" /> predicted dot
+                  </span>
+                </div>
+              )}
+              <dl className="facts">
+                {selectedItem.facts.map((f) => (
+                  <div key={f.label}>
+                    <dt>{f.label}</dt>
+                    <dd>{f.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          <div className="note">
+            Green dots are sampled from the forecast rates: TimesFM predicts <i>how many</i> quakes a region gets, each dot's
+            magnitude comes from that region's own history. Click an entry to turn the globe there, ↑ ↓ to step.
+          </div>
         </aside>
       ) : (
         <button type="button" className="globePanelToggle ghostBtn" onClick={() => setPanelOpen(true)}>

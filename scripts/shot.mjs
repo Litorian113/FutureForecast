@@ -5,9 +5,12 @@
 import { spawn } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 const [url, out, actionsJson] = process.argv.slice(2);
+// viewport via env: SHOT_W=390 SHOT_H=844 node shot.mjs … (default 1440x900)
+const VW = Number(process.env.SHOT_W || 1440), VH = Number(process.env.SHOT_H || 900);
+const MOBILE = VW < 800;
 const actions = actionsJson ? JSON.parse(actionsJson) : [];
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  ['--headless=new', '--remote-debugging-port=9334', '--window-size=1440,900', '--hide-scrollbars', '--no-first-run', '--user-data-dir=/tmp/fw-chrome', 'about:blank'],
+  ['--headless=new', '--remote-debugging-port=9334', `--window-size=${VW},${VH}`, '--hide-scrollbars', '--no-first-run', '--user-data-dir=/tmp/fw-chrome', 'about:blank'],
   { stdio: 'ignore' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let target;
@@ -23,7 +26,7 @@ ws.onmessage = (ev) => { const m = JSON.parse(ev.data); if (m.id && pending.has(
   if (m.method === 'Runtime.exceptionThrown') logs.push('exception: ' + (m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text)); };
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
 await send('Runtime.enable'); await send('Page.enable');
-await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+await send('Emulation.setDeviceMetricsOverride', { width: VW, height: VH, deviceScaleFactor: 1, mobile: MOBILE });
 await send('Page.navigate', { url }); await sleep(2500);
 const evalJs = async (js) => (await send('Runtime.evaluate', { expression: js, awaitPromise: true, returnByValue: true })).result?.result?.value;
 for (const a of actions) {
