@@ -9,10 +9,12 @@ interface Props {
   models: string[];
   visible: string[];
   onToggle: (m: string) => void;
+  /** the verdict sentence of the headline, shown at the top of the column */
+  intro?: React.ReactNode;
 }
 
-/** Right column: legend with per-week MAE (click to toggle) and the week's context flags. */
-export default function WeekPanel({ data, record, models, visible, onToggle }: Props) {
+/** Right column: verdict, the week's context flags, and the legend with per-week MAE (click to toggle). */
+export default function WeekPanel({ data, record, models, visible, onToggle, intro }: Props) {
   const cutoff = parseLocal(record.cutoff);
   const end = addHours(cutoff, data.meta.horizon - 1);
   const holidays = holidaysInWindow(cutoff, data.meta.horizon);
@@ -24,6 +26,7 @@ export default function WeekPanel({ data, record, models, visible, onToggle }: P
 
   return (
     <div className="stack sideCol">
+      {intro && <p className="verdict">{intro}</p>}
       <div className="week">
         <div className="panelTitle" style={{ marginBottom: 8 }}>
           <span>This week</span>
@@ -61,9 +64,10 @@ export default function WeekPanel({ data, record, models, visible, onToggle }: P
       </div>
 
       <div>
-        <div className="panelTitle" style={{ marginBottom: 6 }}>
+        <div className="panelTitle" style={{ marginBottom: 2 }}>
           <span>Models · MAE this week</span>
         </div>
+        <div className="legendHint">Click a model to show or hide it in the chart and the scorecard.</div>
         <div className="legend">
           {models.map((m) => {
             const st = styleOf(m);

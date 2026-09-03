@@ -135,20 +135,86 @@ function BigLine({ series, xLabels, xTickEvery, hoverLabel, yLabel }: BigLinePro
   );
 }
 
-/** MAE for every lead hour 1..168, one line per visible model. */
+/** MAE at the reported lead times (1, 6, 24, 72, 168 h) as grouped bars - the big version of the
+ * mini chart, one bar per visible model and lead, value on top, legend at the right. */
 export function LeadChart({ data, visible }: { data: Backtest; visible: string[] }) {
+  const [hover, setHover] = useState<{ lead: number; model: string } | null>(null);
   const models = visible.filter((m) => data.byLead[m]);
-  const H = data.meta.horizon;
-  const series = models.map((m) => ({ name: m, values: data.byLead[m].slice(0, H) }));
-  const labels = Array.from({ length: H }, (_, i) => `${i + 1} h`);
+  const leads = data.meta.leadsReported;
+  const vals = leads.map((l) => models.map((m) => data.byLead[m][l - 1] ?? 0));
+  const max = Math.max(...vals.flat(), 1) * 1.12;
+  const y = (v: number) => PAD.top + innerH - (v / max) * innerH;
+  const groupW = innerW / leads.length;
+  const gap = 4;
+  const barW = Math.max(6, Math.min(34, (groupW * 0.72 - gap * (models.length - 1)) / models.length));
+  const groupInner = models.length * barW + (models.length - 1) * gap;
+  const yt = ticks(max);
+
   return (
-    <BigLine
-      series={series}
-      xLabels={labels}
-      xTickEvery={24}
-      hoverLabel={(i) => `Lead ${i + 1} h · day ${Math.floor(i / 24) + 1}`}
-      yLabel="MAE (MW) by lead hour"
-    />
+    <div className="bigChart">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="MAE (MW) by lead time" onMouseLeave={() => setHover(null)}>
+        <g className="axis">
+          {yt.map((v) => (
+            <g key={v}>
+              <line x1={PAD.left} x2={PAD.left + innerW} y1={y(v)} y2={y(v)} />
+              <text x={PAD.left - 10} y={y(v) + 4} textAnchor="end">
+                {fmtMW(v)}
+              </text>
+            </g>
+          ))}
+          <line className="baseline" x1={PAD.left} x2={PAD.left + innerW} y1={PAD.top + innerH} y2={PAD.top + innerH} />
+          {leads.map((l, gi) => (
+            <text key={l} x={PAD.left + gi * groupW + groupW / 2} y={H - 16} textAnchor="middle">
+              {l < 24 ? `${l} h` : `${l} h · day ${l / 24}`}
+            </text>
+          ))}
+          <text x={PAD.left} y={PAD.top - 6} className="axisTitle">
+            MAE (MW) by lead time
+          </text>
+        </g>
+        {leads.map((l, gi) =>
+          models.map((m, mi) => {
+            const v = vals[gi][mi];
+            const st = styleOf(m);
+            const x0 = PAD.left + gi * groupW + (groupW - groupInner) / 2 + mi * (barW + gap);
+            const active = hover && hover.lead === l && hover.model === m;
+            return (
+              <g key={`${l}-${m}`} onMouseEnter={() => setHover({ lead: l, model: m })}>
+                <rect x={x0} y={y(v)} width={barW} height={PAD.top + innerH - y(v)} rx={3} fill={st.color} opacity={st.dash ? 0.55 : active ? 1 : 0.9} />
+                {(active || models.length <= 5) && (
+                  <text x={x0 + barW / 2} y={y(v) - 6} textAnchor="middle" className="barLabel" fill={st.color}>
+                    {fmtMW(v)}
+                  </text>
+                )}
+              </g>
+            );
+          }),
+        )}
+        {models.map((m, i) => {
+          const st = styleOf(m);
+          return (
+            <g key={m} transform={`translate(${PAD.left + innerW + 14}, ${PAD.top + 8 + i * 20})`}>
+              <rect x={0} y={-6} width={12} height={12} rx={2} fill={st.color} opacity={st.dash ? 0.55 : 1} />
+              <text x={18} y={4} className="endLabel" fill={st.color}>
+                {st.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      {hover && (
+        <div className="tooltip" style={{ right: 20, top: 30 }}>
+          <div className="when">Lead {hover.lead} h</div>
+          <div className="line">
+            <span className="nm">
+              <i className="swatch" style={{ color: styleOf(hover.model).color }} />
+              {styleOf(hover.model).label}
+            </span>
+            <span>{fmtMW(data.byLead[hover.model][hover.lead - 1] ?? 0)} MW</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

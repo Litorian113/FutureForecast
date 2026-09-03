@@ -125,23 +125,57 @@ button {
   margin-top: 14px;
 }
 
-.headline .lead {
-  text-align: left;
+/* the two intro paragraphs sit in the side columns, next to the chart */
+.main .lead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   color: var(--muted);
   font-size: 12.5px;
-  line-height: 1.6;
+  line-height: 1.65;
+  padding: 2px 2px 6px 14px;
+  border-left: 1px solid var(--axis);
 }
 
-.headline .verdict {
-  text-align: right;
+.main .lead .leadKicker {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.main .lead .leadFirst {
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+}
+
+.main .lead b {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.main .verdict {
   color: var(--text-2);
   font-size: 13.5px;
   line-height: 1.6;
+  padding: 2px 2px 6px;
 }
 
-.headline .verdict b {
+.main .verdict b {
   color: var(--text);
   font-weight: 600;
+}
+
+.legendHint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0 0 8px;
 }
 
 /* ---------- Main grid ---------- */
@@ -150,15 +184,31 @@ button {
   display: grid;
   grid-template-columns: 400px minmax(0, 1fr) 232px;
   gap: 24px;
-  align-items: stretch;
+  /* every column sits vertically centred in the free height, so the page reads as one balanced row */
+  align-items: center;
   min-height: 0;
 }
 
 .main > .stack,
 .main > .sideCol {
   min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
   scrollbar-width: thin;
+}
+
+/* chart on top, the backtest timeline directly beneath it - the slider spans the chart, not the page */
+.centerCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+}
+
+.centerCol > .chartWrap {
+  flex: none;
+  height: min(430px, 52vh);
 }
 
 @media (max-width: 1100px) {
@@ -929,4 +979,14 @@ button {
 .bigChart .endLabel {
   font-size: 12px;
   font-family: var(--font);
+}
+
+/* weekend shading in the load chart: a faint hint only */
+.weekendBand {
+  opacity: 0.35;
+}
+
+.bigChart .barLabel {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
 }

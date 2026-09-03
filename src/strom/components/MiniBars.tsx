@@ -108,7 +108,7 @@ export default function MiniBars({ data, visible }: Props) {
       {open === 'lead' && (
         <Modal
           title="MAE by lead time"
-          subtitle={`Mean absolute error for every forecast hour 1 … ${data.meta.horizon} over all ${data.meta.cutoffs} weeks, visible models only. Vertical grid = one day.`}
+          subtitle={`Mean absolute error at lead ${data.meta.leadsReported.join(', ')} h over all ${data.meta.cutoffs} weeks, visible models only.`}
           onClose={() => setOpen(null)}
           wide
         >

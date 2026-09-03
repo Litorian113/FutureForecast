@@ -7,7 +7,7 @@ export default function Hub() {
       <header className="hubHead">
         <h1>Can a foundation model forecast from the history alone?</h1>
         <p>
-          Google <b>TimesFM 3.0</b>, zero-shot, no training — applied to three subjects and measured against the methods
+          Google <b>TimesFM 3.0</b>, zero-shot, no training, applied to three subjects and measured against the methods
           that are standard there. The answers differ. Pick a scenario:
         </p>
       </header>
@@ -19,7 +19,7 @@ export default function Hub() {
           <p className="q">23,000 quakes of M 5.5+ since 1965 and the tsunamis they triggered. TimesFM forecasts the rate per 5° cell ten years ahead.</p>
           <QuakeArt />
           <p className="verdict">
-            <b>A draw.</b> 49 of 50 real quakes fell into a forecast cell — but the cell's own climatology hits just as well. The model adds level and trend, not new places.
+            <b>A draw.</b> 49 of 50 real quakes fell into a forecast cell, but the cell's own climatology hits just as well. The model adds level and trend, not new places.
           </p>
           <span className="open">Open the 3D globe <i>→</i><small>USGS · NOAA · 1965–2016 · forecast 2017–2026</small></span>
         </a>
@@ -41,7 +41,7 @@ export default function Hub() {
           <p className="q">Hourly temperature for any city in the world, computed live, against persistence, climatology and a real weather model.</p>
           <WeatherArt />
           <p className="verdict">
-            <b>The weather model wins.</b> On day 1 TimesFM beats every trivial method; from day 3 it is down at climatology. The weather model is 2–3× more accurate — it sees the front, the time series does not.
+            <b>The weather model wins.</b> On day 1 TimesFM beats every trivial method; from day 3 it is down at climatology. The weather model is 2–3× more accurate: it sees the front, the time series does not.
           </p>
           <span className="open">Open the forecast <i>→</i><small>Open-Meteo · ERA5 · 7 cities · 1,281 cutoffs</small></span>
         </a>

@@ -199,7 +199,7 @@ body {
 .tile.weather {
   background: #232730;
   color: #eef1f6;
-  box-shadow: 10px 10px 24px #121419, -8px -8px 20px #2b303b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tile.weather .no,

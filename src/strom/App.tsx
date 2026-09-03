@@ -81,26 +81,20 @@ function Benchmark({ data }: { data: Backtest }) {
 
   return (
     <Frame region={`${data.meta.region} · hourly load`} range={years}>
-      <div className="headline">
-        <h1>{head.title}</h1>
-        <div className="headlineCols">
-          <p className="lead">{head.lead}</p>
-          <p className="verdict">{head.verdict}</p>
-        </div>
-      </div>
-
       <div className="main">
         <div className="stack">
+          <p className="lead">{head.lead}</p>
           <Scorecard data={data} models={models} visible={visible} onToggle={toggle} />
           <div className="panel">
             <MiniBars data={data} visible={visible} />
           </div>
         </div>
-        <Chart record={record} visible={visible} />
-        <WeekPanel data={data} record={record} models={models} visible={visible} onToggle={toggle} />
+        <div className="centerCol">
+          <Chart record={record} visible={visible} />
+          <BacktestSlider cutoffs={data.cutoffs} index={index} playing={playing} winner={winner} onChange={onChange} onPlay={onPlay} />
+        </div>
+        <WeekPanel data={data} record={record} models={models} visible={visible} onToggle={toggle} intro={head.verdict} />
       </div>
-
-      <BacktestSlider cutoffs={data.cutoffs} index={index} playing={playing} winner={winner} onChange={onChange} onPlay={onPlay} />
     </Frame>
   );
 }
@@ -121,11 +115,17 @@ function headline(
 
   const lead = (
     <>
-      {meta.region} is a zone of the PJM grid in the eastern United States, {fmtGW(meta.truthMean)} of average
-      demand, metered every hour. Every {weekdayName(first)} of a {years}-year test period the history is cut and{' '}
-      {models.length} forecasters predict the next {meta.horizon} hours: {classics.length} classical methods and{' '}
-      {tfms.length} variants of TimesFM 3.0, a time-series foundation model that has never seen this grid. Each one
-      sees only what happened before the cut.
+      <span className="leadKicker">The setup</span>
+      <span className="leadFirst">
+        <b>{meta.region}</b> is a zone of the PJM grid in the eastern United States: <b>{fmtGW(meta.truthMean)}</b> of
+        average demand, metered every hour.
+      </span>
+      <span className="leadRest">
+        Every {weekdayName(first)} of a {years}-year test period the history is cut and <b>{models.length} forecasters</b>{' '}
+        predict the next <b>{meta.horizon} hours</b>: {classics.length} classical methods and {tfms.length} variants of
+        TimesFM 3.0, a time-series foundation model that has never seen this grid. Each one sees only what happened
+        before the cut.
+      </span>
     </>
   );
 
