@@ -337,7 +337,7 @@ export default function Globe() {
     controls.minDistance = RADIUS + 0.5;
     controls.maxDistance = 40;
 
-    // ---- space around the globe: a sparse, slowly drifting star field and a faint additive rim glow.
+    // ---- space around the globe: a sparse, slowly drifting star field.
     const space = new THREE.Group();
     // round, soft star sprite (PointsMaterial draws squares otherwise)
     const starCanvas = document.createElement('canvas');
@@ -379,19 +379,6 @@ export default function Globe() {
     space.add(makeStars(90, 60, 130, 1.1, 0xc4d2ff, 0.75));
     scene.add(space);
 
-    const glowMaterial = new THREE.ShaderMaterial({
-      uniforms: { color: { value: new THREE.Color(0x7d8ee8) } },
-      vertexShader: 'varying vec3 vN; void main() { vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader:
-        'uniform vec3 color; varying vec3 vN; void main() { float rim = 1.0 - abs(dot(vN, vec3(0.0, 0.0, 1.0))); float i = pow(rim, 2.6) * 2.2; gl_FragColor = vec4(color * i, i); }',
-      blending: THREE.AdditiveBlending,
-      side: THREE.FrontSide,
-      transparent: true,
-      depthWrite: false,
-    });
-    const glow = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.16, 64, 64), glowMaterial);
-    glow.renderOrder = -3;
-    scene.add(glow);
 
     const globe = new THREE.Group();
     const sphere = new THREE.Points(new THREE.SphereGeometry(RADIUS, 64, 64), new THREE.PointsMaterial({ color: GLOBE_COLOR, size: GLOBE_POINT_SIZE }));
@@ -583,8 +570,6 @@ export default function Globe() {
         pts.geometry.dispose();
         (pts.material as THREE.Material).dispose();
       });
-      glow.geometry.dispose();
-      glowMaterial.dispose();
       starSprite.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
