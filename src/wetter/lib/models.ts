@@ -1,15 +1,15 @@
 /** Labels and line styles of the two live sources and the backtest models. */
 export const LABELS: Record<string, string> = {
-  persistence: 'Persistenz (gestern)',
-  naive_week: 'Letzte Woche',
-  climatology: 'Klimatologie',
-  blend: 'Blend (Persistenz → Klima)',
-  nwp: 'Wettermodell (Open-Meteo)',
-  nwp_ecmwf: 'Wettermodell (ECMWF)',
-  timesfm: 'TimesFM 3.0 (92 Tage)',
-  timesfm_long: 'TimesFM 3.0 (1 Jahr)',
-  timesfm_cov: 'TimesFM 3.0 + Kalender',
-  timesfm_multi: 'TimesFM 3.0 (6 Variablen)',
+  persistence: 'Persistence (yesterday)',
+  naive_week: 'Last week',
+  climatology: 'Climatology',
+  blend: 'Blend (persistence → climatology)',
+  nwp: 'Weather model (Open-Meteo)',
+  nwp_ecmwf: 'Weather model (ECMWF)',
+  timesfm: 'TimesFM 3.0 (92 days)',
+  timesfm_long: 'TimesFM 3.0 (1 year)',
+  timesfm_cov: 'TimesFM 3.0 + calendar',
+  timesfm_multi: 'TimesFM 3.0 (6 variables)',
 };
 
 /** Colours chosen for the light and the dark neumorphic ground and for colour-vision deficiency:

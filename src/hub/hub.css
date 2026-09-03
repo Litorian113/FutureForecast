@@ -1,0 +1,282 @@
+/* Start page. Neutral dark ground; each tile carries the design of the page it opens. */
+:root {
+  color-scheme: dark;
+  --bg: #0e0f12;
+  --text: #f2f2f0;
+  --muted: #8b8f98;
+  --line: #24262c;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono: 'Sometype Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hub {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 22px;
+  padding: 30px 48px 20px;
+}
+
+/* ---------- head ---------- */
+.hubHead {
+  max-width: 900px;
+}
+
+.hubHead h1 {
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  margin-bottom: 12px;
+}
+
+.hubHead p {
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 760px;
+}
+
+.hubHead b {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ---------- tiles ---------- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  min-height: 0;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 26px 20px;
+  border-radius: 22px;
+  text-decoration: none;
+  color: inherit;
+  min-height: 460px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+}
+
+.tile:focus-visible {
+  outline: 2px solid #b9cfe0;
+  outline-offset: 4px;
+}
+
+.tile .no {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.tile h2 {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.tile .q {
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.tile .art {
+  flex: 1;
+  width: 100%;
+  min-height: 120px;
+  margin: 6px 0 2px;
+}
+
+.verdict {
+  font-size: 12.5px;
+  line-height: 1.5;
+  opacity: 0.92;
+}
+
+.verdict b {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.open {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid currentColor;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.open i {
+  font-style: normal;
+  transition: transform 0.2s ease;
+}
+
+.tile:hover .open i {
+  transform: translateX(4px);
+}
+
+.open small {
+  flex-basis: 100%;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.tile.quake .art.globe {
+  margin: 6px -26px 2px;
+  width: calc(100% + 52px);
+}
+
+/* --- 01 earthquake: near-black, monospace, warm dots --- */
+.tile.quake {
+  background: rgb(20, 20, 30);
+  font-family: var(--mono);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tile.quake .open {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* --- 02 grid: black dotted ground, Inter light --- */
+.tile.grid {
+  background-color: #0a0a0a;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.16) 1px, transparent 1.2px);
+  background-size: 28px 28px;
+  background-position: 14px 14px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.tile.grid h2 {
+  font-weight: 300;
+}
+
+.tile.grid .open {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* --- 03 weather: neumorphic, dark palette of the weather page --- */
+.tile.weather {
+  background: #232730;
+  color: #eef1f6;
+  box-shadow: 10px 10px 24px #121419, -8px -8px 20px #2b303b;
+}
+
+.tile.weather .no,
+.tile.weather .q {
+  color: #a3abba;
+  opacity: 1;
+}
+
+.tile.weather .verdict {
+  color: #c6ccd8;
+}
+
+.tile.weather .verdict b {
+  color: #eef1f6;
+}
+
+.tile.weather .open {
+  border-color: #2f3441;
+}
+
+.wcard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-radius: 24px;
+  background: #232730;
+  box-shadow: 8px 8px 16px #1b1e25, -8px -8px 16px #2b303b;
+}
+
+.wtemp {
+  font-size: 76px;
+  font-weight: 200;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: #eef1f6;
+}
+
+.wsun {
+  width: 72px;
+  height: 72px;
+  color: #c6ccd8;
+  filter: drop-shadow(3px 3px 4px #1b1e25) drop-shadow(-3px -3px 4px #2b303b);
+}
+
+.wband {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 14px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(134, 173, 255, 0.15), rgba(134, 173, 255, 0.5), rgba(134, 173, 255, 0.15));
+}
+
+/* ---------- foot ---------- */
+.hubFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .tile {
+    min-height: 0;
+  }
+
+  .tile .art {
+    min-height: 120px;
+  }
+}

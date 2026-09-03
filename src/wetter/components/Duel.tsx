@@ -31,11 +31,12 @@ const MAX = 3; // a factor of 3 fills the track completely
 export default function Duel({ err, hind, days, onOpen }: Props) {
   if (!err || !err.byLead.nwp) {
     return (
-      <section className="raised duel" aria-label="Modellvergleich">
-        <span className="label">Wer gewinnt?</span>
+      <section className="raised duel" aria-label="Model comparison">
+        <span className="label">Who wins?</span>
         <p className="duelNote">
-          Für diesen Ort gibt es noch keinen Backtest. <code>weather/backtest.py</code> ausführen.
+          No backtest for this place yet. Run <code>weather/backtest.py</code>.
         </p>
+        <LastRuns hind={hind} days={days} />
       </section>
     );
   }
@@ -49,11 +50,11 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
   const nwpWins = mean != null && mean > 1;
 
   return (
-    <section className="raised duel" aria-label="Modellvergleich">
+    <section className="raised duel" aria-label="Model comparison">
       <div className="duelHead">
-        <span className="label">Wer gewinnt?</span>
+        <span className="label">Who wins?</span>
         <span className="duelSub">
-          Backtest {err.city} {err.year} · {err.cutoffs} Cutoffs
+          Backtest {err.city} {err.year} · {err.cutoffs} cutoffs
         </span>
       </div>
 
@@ -61,10 +62,10 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
         <>
           <div className="verdict">
             <span className="who" style={{ color: nwpWins ? 'var(--c-nwp)' : 'var(--c-timesfm)' }}>
-              {nwpWins ? 'Wettermodell' : 'TimesFM'}
+              {nwpWins ? 'Weather model' : 'TimesFM'}
             </span>
-            <span className="factor num">{(nwpWins ? mean : 1 / mean).toFixed(1)}× genauer</span>
-            <span className="over">im Mittel über {days} Tage</span>
+            <span className="factor num">{(nwpWins ? mean : 1 / mean).toFixed(1)}× more accurate</span>
+            <span className="over">averaged over {days} days</span>
           </div>
 
           <ul className="duelRows">
@@ -73,7 +74,7 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
               const win = r != null && r > 1;
               return (
                 <li key={i}>
-                  <span className="d">Tag {i + 1}</span>
+                  <span className="d">Day {i + 1}</span>
                   <span className="track" aria-hidden="true">
                     <i className="mid" />
                     <i
@@ -95,30 +96,30 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
 
           <LastRuns hind={hind} days={days} />
           <div className="duelFoot">
-            <span className="dfHead">Backtest-Mittel Tag 1 → Tag {days}</span>
+            <span className="dfHead">Backtest mean day 1 → day {days}</span>
             <span>
               <i className="swatch" style={{ color: 'var(--c-timesfm)' }} /> TimesFM {tf![0]?.toFixed(1)} →{' '}
               {tf![days - 1]?.toFixed(1)} °C
             </span>
             <span>
-              <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Modell {nwp[0]?.toFixed(1)} →{' '}
+              <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Model {nwp[0]?.toFixed(1)} →{' '}
               {nwp[days - 1]?.toFixed(1)} °C
             </span>
           </div>
           <button className="duelMore" onClick={onOpen}>
-            Alle Modelle ansehen
+            Show all models
           </button>
         </>
       ) : (
         <>
           <p className="duelNote">
-            Im Backtest von {err.city} ist TimesFM noch nicht durchgerechnet — das Wettermodell liegt dort bei{' '}
-            <b className="num">{nwp[0]?.toFixed(1)} °C</b> an Tag 1 und{' '}
-            <b className="num">{nwp[days - 1]?.toFixed(1)} °C</b> an Tag {days}. Gemessen wurde hier aber:
+            TimesFM has not been backtested for {err.city} yet — the weather model scores{' '}
+            <b className="num">{nwp[0]?.toFixed(1)} °C</b> at day 1 and{' '}
+            <b className="num">{nwp[days - 1]?.toFixed(1)} °C</b> at day {days} there. Measured right here, however:
           </p>
           <LastRuns hind={hind} days={days} />
           <button className="duelMore" onClick={onOpen}>
-            Alle Modelle ansehen
+            Show all models
           </button>
         </>
       )}
@@ -135,14 +136,14 @@ function LastRuns({ hind, days }: { hind: Hindcast | null; days: number }) {
   return (
     <div className="lastRun">
       <span className="lrHead">
-        Hier gemessen · {hind.runs} Läufe à {days} Tage
+        Measured here · {hind.runs} runs of {days} days
       </span>
       <span className={`lrRow${better === 'timesfm' ? ' win' : ''}`}>
         <i className="swatch dashed" style={{ color: 'var(--c-timesfm)' }} /> TimesFM
         <b className="num">{hind.mae.timesfm == null ? '–' : `${hind.mae.timesfm.toFixed(2)} °C`}</b>
       </span>
       <span className={`lrRow${better === 'nwp' ? ' win' : ''}`}>
-        <i className="swatch dashed" style={{ color: 'var(--c-nwp)' }} /> Wettermodell
+        <i className="swatch dashed" style={{ color: 'var(--c-nwp)' }} /> Weather model
         <b className="num">{hind.mae.nwp == null ? '–' : `${hind.mae.nwp.toFixed(2)} °C`}</b>
       </span>
     </div>

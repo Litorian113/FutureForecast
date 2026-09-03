@@ -10,11 +10,11 @@ interface Props {
   days: number;
 }
 
-/** Seven raised day cards; the selected one is pressed in. With "both" the card splits into two
+/** Raised day cards; the selected one is pressed in. With "both" the card splits into two
  * rows, one per source, separated by a hairline and marked by the source's colour. */
 export default function DayCards({ data, source, selected, onSelect, days }: Props) {
   return (
-    <div className="days" role="list" aria-label={`${days} Tage`} style={{ gridTemplateColumns: `repeat(${days}, minmax(0, 1fr))` }}>
+    <div className="days" role="list" aria-label={`${days} days`} style={{ gridTemplateColumns: `repeat(${days}, minmax(0, 1fr))` }}>
       {data.daily.timesfm.slice(0, days).map((tf, i) => {
         const nwp = data.daily.nwp[i];
         const d = parseLocal(tf.date);
@@ -26,16 +26,16 @@ export default function DayCards({ data, source, selected, onSelect, days }: Pro
             role="listitem"
             aria-pressed={selected === i}
             onClick={() => onSelect(selected === i ? null : i)}
-            aria-label={`${fmtDay(d)}: ${source === 'both' ? `TimesFM ${describe(tf)}; Wettermodell ${describe(nwp)}` : describe(one)}`}
+            aria-label={`${fmtDay(d)}: ${source === 'both' ? `TimesFM ${describe(tf)}; weather model ${describe(nwp)}` : describe(one)}`}
           >
             <span className="head">
-              <span className="dow">{i === 0 ? 'Heute' : i === 1 ? 'Morgen' : fmtDay(d)}</span>
+              <span className="dow">{i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : fmtDay(d)}</span>
               <span className="date">{fmtDate(d)}</span>
             </span>
             {source === 'both' ? (
               <>
                 <Row card={tf} accent="var(--c-timesfm)" label="TimesFM" />
-                <Row card={nwp} accent="var(--c-nwp)" label="Wettermodell" />
+                <Row card={nwp} accent="var(--c-nwp)" label="Weather model" />
               </>
             ) : (
               <span className="single">
@@ -44,7 +44,7 @@ export default function DayCards({ data, source, selected, onSelect, days }: Pro
                   <span className="hi num">{fmtDeg(one.tmax)}</span>
                   <span className="lo num">{fmtDeg(one.tmin)}</span>
                 </span>
-                <span className="rain num">{Math.round(one.pRain * 100)} % Regen</span>
+                <span className="rain num">{Math.round(one.pRain * 100)} % rain</span>
               </span>
             )}
           </button>
@@ -71,5 +71,5 @@ function Row({ card, accent, label }: { card: DayCard; accent: string; label: st
 }
 
 function describe(c: DayCard): string {
-  return `${c.icon ?? 'unbekannt'}, ${fmtDeg(c.tmax)} bis ${fmtDeg(c.tmin)}, Regen ${Math.round(c.pRain * 100)} %`;
+  return `${c.icon ?? 'unknown'}, ${fmtDeg(c.tmax)} to ${fmtDeg(c.tmin)}, rain ${Math.round(c.pRain * 100)} %`;
 }

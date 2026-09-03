@@ -1,4 +1,4 @@
-const NBSP = ' ';
+const NBSP = ' ';
 
 export const fmtTemp = (v: number | null | undefined, digits = 0): string =>
   v == null ? '–' : `${v.toFixed(digits).replace('-', '−')}${NBSP}°C`;
@@ -10,9 +10,9 @@ export const fmtSigned = (v: number, digits = 1): string =>
 export const fmtPm = (v: number | null | undefined, digits = 1): string =>
   v == null ? '–' : `±${v.toFixed(digits)}${NBSP}°C`;
 
-const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-const DAYS_LONG = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-const MONTHS = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Parses the server's local-time ISO strings ("2026-09-03T14:00") as local dates (no zone shift). */
 export function parseLocal(iso: string): Date {
@@ -23,8 +23,8 @@ export function parseLocal(iso: string): Date {
 }
 
 export const addHours = (d: Date, h: number): Date => new Date(d.getTime() + h * 3600_000);
-export const fmtDay = (d: Date): string => `${DAYS[d.getDay()]} ${d.getDate()}.`;
+export const fmtDay = (d: Date): string => `${DAYS[d.getDay()]} ${d.getDate()}`;
 export const fmtDayLong = (d: Date): string => DAYS_LONG[d.getDay()];
-export const fmtDate = (d: Date): string => `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+export const fmtDate = (d: Date): string => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 export const fmtDateTime = (d: Date): string =>
-  `${DAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]} · ${String(d.getHours()).padStart(2, '0')}:00`;
+  `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} · ${String(d.getHours()).padStart(2, '0')}:00`;

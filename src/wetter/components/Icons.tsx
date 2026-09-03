@@ -6,12 +6,12 @@ interface Props {
   title?: string;
 }
 
-const LABEL: Record<IconClass, string> = { clear: 'klar', cloudy: 'bewölkt', rain: 'Regen', snow: 'Schnee', fog: 'Nebel' };
+const LABEL: Record<IconClass, string> = { clear: 'clear', cloudy: 'cloudy', rain: 'rain', snow: 'snow', fog: 'fog' };
 
 /** Small hand-drawn SVG set in soft raised shapes (no icon font). Shapes are filled with the
  * page ground and lifted by a paired drop shadow; strokes carry the meaning. */
 export default function WeatherIcon({ kind, className, title }: Props) {
-  const label = kind ? LABEL[kind] : 'unbekannt';
+  const label = kind ? LABEL[kind] : 'unknown';
   return (
     <svg viewBox="0 0 64 64" className={className} role="img" aria-label={title ?? label}>
       <defs>

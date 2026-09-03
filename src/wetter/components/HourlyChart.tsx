@@ -150,7 +150,7 @@ export default function HourlyChart({ data, source, selectedDay, days }: Props) 
   return (
     <div className="chartWrap" ref={ref}>
       <div className="chartScroll" ref={scrollRef} onScroll={(e) => setScrollLeft(e.currentTarget.scrollLeft)}>
-        <svg width={W} height={Hpx} viewBox={`0 0 ${W} ${Hpx}`} onMouseMove={onMove} onMouseLeave={() => setHover(null)} role="img" aria-label="Stündliche Temperatur: 14 Tage Historie und 7 Tage Vorhersage">
+        <svg width={W} height={Hpx} viewBox={`0 0 ${W} ${Hpx}`} onMouseMove={onMove} onMouseLeave={() => setHover(null)} role="img" aria-label="Hourly temperature: 14 days of history and the forecast">
           {dayTicks.map((d) => (
             <rect key={`n${d.i}`} className="nightBand" x={x(d.i - 3)} y={PAD.top} width={x(d.i + 6) - x(d.i - 3)} height={innerH} />
           ))}
@@ -184,10 +184,10 @@ export default function HourlyChart({ data, source, selectedDay, days }: Props) 
           {showTf && <path d={path(pts(tf.mean, nHist))} fill="none" stroke="var(--c-timesfm)" strokeWidth={2.2} strokeLinejoin="round" />}
           <line x1={xCut} x2={xCut} y1={PAD.top - 8} y2={PAD.top + innerH} stroke="var(--text-2)" strokeDasharray="3 4" />
           <text className="cutoffLabel" x={xCut - 6} y={PAD.top - 2} textAnchor="end">
-            Historie
+            History
           </text>
           <text className="cutoffLabel" x={xCut + 6} y={PAD.top - 2}>
-            jetzt · {H} h voraus
+            now · {H} h ahead
           </text>
           {hover != null && hv && (
             <g>
@@ -215,14 +215,14 @@ export default function HourlyChart({ data, source, selectedDay, days }: Props) 
             <>
               <div className="line">
                 <span className="nm">
-                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> Gemessen
+                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> Measured
                 </span>
                 <span className="num">{fmtTemp(hv.hist, 1)}</span>
               </div>
               {showTf && hv.pastTf != null && (
                 <div className="line">
                   <span className="nm">
-                    <i className="swatch dashed" style={{ color: 'var(--c-timesfm)', opacity: 0.6 }} /> TimesFM damals
+                    <i className="swatch dashed" style={{ color: 'var(--c-timesfm)', opacity: 0.6 }} /> TimesFM back then
                   </span>
                   <span className="num">
                     {fmtTemp(hv.pastTf, 1)}
@@ -233,7 +233,7 @@ export default function HourlyChart({ data, source, selectedDay, days }: Props) 
               {showNwp && hv.pastNwp != null && (
                 <div className="line">
                   <span className="nm">
-                    <i className="swatch dashed" style={{ color: 'var(--c-nwp)', opacity: 0.6 }} /> Modell damals
+                    <i className="swatch dashed" style={{ color: 'var(--c-nwp)', opacity: 0.6 }} /> Model back then
                   </span>
                   <span className="num">
                     {fmtTemp(hv.pastNwp, 1)}
@@ -259,14 +259,14 @@ export default function HourlyChart({ data, source, selectedDay, days }: Props) 
           {'nwp' in hv && showNwp && (
             <div className="line">
               <span className="nm">
-                <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Wettermodell
+                <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Weather model
               </span>
               <span className="num">{fmtTemp(hv.nwp, 1)}</span>
             </div>
           )}
           {'tf' in hv && source === 'both' && hv.tf != null && hv.nwp != null && (
             <div className="line">
-              <span className="nm" style={{ color: 'var(--muted)' }}>Differenz</span>
+              <span className="nm" style={{ color: 'var(--muted)' }}>Difference</span>
               <span className="num" style={{ color: 'var(--muted)' }}>{fmtSigned(hv.tf - hv.nwp)} °C</span>
             </div>
           )}

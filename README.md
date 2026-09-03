@@ -1,6 +1,6 @@
 <div align="center">
 
-# FutureWeather
+# Future Lab · FutureWeather
 
 **Sieben Tage Wetter aus der Historie allein.**
 TimesFM 3.0 zero-shot gegen Persistenz, Klimatologie und ein echtes Wettermodell,
@@ -9,6 +9,13 @@ gemessen über ein Jahr, sieben Klimazonen und 1 281 Vorhersagen.
 React · TypeScript · Vite · Python · FastAPI · Open-Meteo · TimesFM 3.0
 
 </div>
+
+> **Dieses Repository ist seit dem 3. September 2026 die Startseite für drei Szenarien.** `index.html` ist
+> eine Übersicht, von der aus man in **Erdbeben** (Globus, three.js), **Strom** (FutureGrid) und **Wetter**
+> (dieses Projekt) springt. Jedes Szenario ist eine eigene Vite-Seite mit eigenem Bundle und eigenem
+> Stylesheet — die drei Designs teilen sich keine Seite. Siehe [Drei Szenarien](#drei-szenarien).
+
+![Startseite](docs/hub.png)
 
 ![FutureWeather, hell](docs/screenshot.png)
 
@@ -36,6 +43,7 @@ Fächer wächst von 5 °C an Tag 1 auf 10 °C an Tag 7. Das Modell weiß also, w
 
 ## Inhalt
 
+- [Drei Szenarien](#drei-szenarien)
 - [Worum es geht](#worum-es-geht)
 - [Die Seite](#die-seite)
 - [Daten](#daten)
@@ -45,6 +53,30 @@ Fächer wächst von 5 °C an Tag 1 auf 10 °C an Tag 7. Das Modell weiß also, w
 - [Reproduktion](#reproduktion)
 - [Einschränkungen](#einschränkungen)
 - [Struktur](#struktur)
+
+## Drei Szenarien
+
+Dieselbe Frage — *kann TimesFM 3.0 zero-shot aus der Historie allein vorhersagen?* — an drei Gegenständen,
+jeweils gegen die dort üblichen Verfahren gemessen. Drei verschiedene Antworten:
+
+| Seite | Szenario | Quelle | Antwort |
+|---|---|---|---|
+| `erdbeben.html` | **Erdbeben** — 23 000 Beben M ≥ 5,5 seit 1965 (USGS), Tsunamis (NOAA), Raten je 5°-Zelle zehn Jahre voraus | `Datenvisualisierung/Visualisierung` (React + three.js) | **Unentschieden.** 49 von 50 realen Beben in einer Prognosezelle, aber die Klimatologie der Zelle trifft genauso |
+| `strom.html` | **Strom** — stündliche PJM-Netzlast, 104 Wochen Backtest, 168 h voraus | `FutureGrid` | **TimesFM gewinnt.** 54 % weniger Fehler als das beste klassische Modell |
+| `wetter.html` | **Wetter** — stündliche Temperatur jeder Stadt, live, 120 h voraus | dieses Projekt | **Wettermodell gewinnt.** TimesFM stark an Tag 1, ab Tag 3 Klimatologie |
+
+Technisch ist das eine Vite-**Multi-Page-App**: `vite.config.ts` listet vier HTML-Einstiege, jeder lädt
+`src/<szenario>/main.tsx`. Die Quellen der beiden importierten Projekte liegen unverändert unter
+`src/strom/` und `src/erdbeben/` (nur ein „← Scenarios“-Link kam hinzu), ihre Daten unter
+`public/data/energy/` bzw. `public/data/*.json` + `public/Assets/`. Von der Erdbeben-App wird im Hub nur
+der **3D-Globus** gezeigt; die übrigen Seiten des Originals (Overview, Time Beam, Comparison, Depth) liegen
+weiter unter `src/erdbeben/pages/`, sind aber nicht verlinkt. **Alle Seiten sind auf Englisch** — die
+Startseite und die Wetterseite wurden übersetzt, FutureGrid und die Erdbeben-App waren es bereits.
+
+| | |
+|---|---|
+| ![Erdbeben](docs/erdbeben.png) | ![Strom](docs/strom.png) |
+| Erdbeben: Punktwolken-Globus mit den grünen TimesFM-Prognosen | Strom: FutureGrid-Benchmark mit Wochen-Slider |
 
 ## Worum es geht
 
@@ -362,9 +394,11 @@ uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requi
 .venv/bin/python weather/backtest.py            # JSON aus dem Cache zusammensetzen
 .venv/bin/python weather/report.py              # Markdown-Tabellen dieser README
 
-# Seite
-npm install && npm run dev                      # http://localhost:5503
-.venv/bin/python weather/server.py              # http://localhost:8000, von Vite unter /api proxied
+# Seite (alle drei Szenarien)
+npm install && npm run dev                      # http://localhost:5503  -> Startseite
+                                                #   /wetter.html  /strom.html  /erdbeben.html
+.venv/bin/python weather/server.py              # http://localhost:8000, nur das Wetter braucht ihn (/api-Proxy)
+npm run build                                   # dist/ mit vier HTML-Seiten
 node scripts/shot.mjs http://localhost:5503/ docs/screenshot.png '[{"type":"wait","ms":8000}]'
 
 # täglicher Archiv-Lauf (launchd; crontab ist unter macOS ohne Freigabe gesperrt)
@@ -410,6 +444,13 @@ Stoppen: `pkill -f weather/server.py`, `pkill -f backtest.py`, `pkill -f vite`.
 ## Struktur
 
 ```
+index.html · wetter.html · strom.html · erdbeben.html   die vier Vite-Einstiege
+src/hub/                      Startseite (Hub.tsx, hub.css)
+src/wetter/                   dieses Projekt: App, Search, Hero, DayCards, Duel, HourlyChart, ErrorPopup, Modal, Icons
+src/strom/                    FutureGrid, unverändert importiert
+src/erdbeben/                 Erdbeben-Visualisierung, unverändert importiert (pages/Globe.tsx = three.js)
+public/data/                  backtest.json (Wetter), energy/ (Strom), earthquakes/tsunamis/forecast/actual.json
+public/Assets/                Karten und Icons der Erdbeben-Seite
 weather/openmeteo.py          Client mit Platten-Cache (geocode, archive, forecast, previous_runs)
 weather/prepare_weather.py    ERA5 -> weather/data/<CITY>.csv, Sanity-Report
 weather/nwp.py                archivierte Modellläufe je Vorlauftag
@@ -421,7 +462,6 @@ weather/backtest.py           Rolling-Origin-Backtest, Metriken, npz-Cache, publ
 weather/report.py             Markdown-Tabellen
 weather/server.py             FastAPI: /api/geocode, /api/forecast
 weather/torch_compat.py       RMSNorm-Shim für torch 2.2.2 (vor timesfm3 importieren)
-src/                          React + TypeScript: App, Search, Hero, DayCards, HourlyChart, ErrorPopup, Modal, Icons
 scripts/shot.mjs              Headless-Chrome-Screenshots
 docs/                         Screenshots
 ```

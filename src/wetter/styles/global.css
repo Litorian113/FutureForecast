@@ -157,6 +157,19 @@ button {
   line-height: 1.2;
 }
 
+.brand .back {
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
+.brand .back:hover {
+  color: var(--text);
+}
+
 .brand .name {
   font-weight: 600;
   font-size: 14px;

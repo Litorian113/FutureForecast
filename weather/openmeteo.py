@@ -71,7 +71,7 @@ def _get(url: str, endpoint: str, params: dict, refresh: bool = False, retries: 
     raise RuntimeError(f"open-meteo {endpoint} failed after {retries} tries: {last}")
 
 
-def geocode(name: str, count: int = 6, language: str = "de", refresh: bool = False) -> list[dict]:
+def geocode(name: str, count: int = 6, language: str = "en", refresh: bool = False) -> list[dict]:
     """City name -> list of {name, country, admin1, latitude, longitude, timezone}."""
     d = _get(GEOCODE_URL, "geocode", {"name": name, "count": count, "language": language, "format": "json"}, refresh)
     return d.get("results", [])

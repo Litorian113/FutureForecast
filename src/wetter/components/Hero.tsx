@@ -11,9 +11,9 @@ interface Props {
 }
 
 const SENTENCE: Record<Source, (d: number) => string> = {
-  timesfm: (d) => `Nächste ${d} Tage laut Historie allein`,
-  nwp: (d) => `Nächste ${d} Tage laut Wettermodell`,
-  both: (d) => `Nächste ${d} Tage: Historie allein neben dem Wettermodell`,
+  timesfm: (d) => `Next ${d} days from the history alone`,
+  nwp: (d) => `Next ${d} days from the weather model`,
+  both: (d) => `Next ${d} days: history alone next to the weather model`,
 };
 
 /** Expected temperature error of the shown source at lead day 1 and `days`, from the backtest of
@@ -35,32 +35,32 @@ export function expectedLine(
 export default function Hero({ data, source, onSource, onChip, days }: Props) {
   const exp = expectedLine(data, source, days);
   return (
-    <section className="raised hero" aria-label="Aktuelles Wetter">
+    <section className="raised hero" aria-label="Current weather">
       <div className="place">
         <span className="city">{data.city.name}</span>
         <span className="country">{[data.city.country, data.city.tz].filter(Boolean).join(' · ')}</span>
       </div>
-      <div className="bigTemp num" aria-label={`Aktuell ${fmtDeg(data.current.temp)}`}>
+      <div className="bigTemp num" aria-label={`Now ${fmtDeg(data.current.temp)}`}>
         {fmtDeg(data.current.temp)}
       </div>
-      <WeatherIcon kind={data.current.icon} className="nowIcon" title={`jetzt: ${data.current.icon}`} />
+      <WeatherIcon kind={data.current.icon} className="nowIcon" title={`now: ${data.current.icon}`} />
       <div className="sentence">
         <span>{SENTENCE[source](days)}</span>
-        <div className="seg" role="group" aria-label="Quelle">
+        <div className="seg" role="group" aria-label="Source">
           {(['timesfm', 'nwp', 'both'] as Source[]).map((s) => (
             <button key={s} aria-pressed={source === s} onClick={() => onSource(s)}>
-              {s === 'timesfm' ? 'TimesFM' : s === 'nwp' ? 'Wettermodell' : 'beide'}
+              {s === 'timesfm' ? 'TimesFM' : s === 'nwp' ? 'Weather model' : 'both'}
             </button>
           ))}
         </div>
-        <button className="chip" onClick={onChip} aria-label="Erwarteter Fehler aus dem Backtest, Details öffnen">
+        <button className="chip" onClick={onChip} aria-label="Expected error from the backtest, open details">
           <span className="dot" style={{ background: source === 'nwp' ? 'var(--c-nwp)' : 'var(--c-timesfm)' }} />
           {exp ? (
             <>
-              Erwarteter Fehler Tag 1: <b>{fmtPm(exp.d1)}</b> · Tag {days}: <b>{fmtPm(exp.dn)}</b>
+              Expected error day 1: <b>{fmtPm(exp.d1)}</b> · day {days}: <b>{fmtPm(exp.dn)}</b>
             </>
           ) : (
-            <>Erwarteter Fehler: Backtest fehlt</>
+            <>Expected error: no backtest yet</>
           )}
         </button>
       </div>

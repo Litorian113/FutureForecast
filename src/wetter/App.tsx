@@ -12,11 +12,11 @@ import Duel from './components/Duel';
  * curve and the duel widget show the first DAYS_SHOWN days of it. */
 const DAYS_SHOWN = 5;
 
-const LS_CITY = 'fw.city';
+const LS_CITY = 'fw.city.v2'; // v2: entries from the German version carried German country names
 const LS_SOURCE = 'fw.source';
 const LS_THEME = 'fw.theme';
 type Theme = 'system' | 'light' | 'dark';
-const THEME_LABEL: Record<Theme, string> = { system: 'Auto', light: 'Hell', dark: 'Dunkel' };
+const THEME_LABEL: Record<Theme, string> = { system: 'Auto', light: 'Light', dark: 'Dark' };
 
 function loadTheme(): Theme {
   const q = new URLSearchParams(location.search).get('theme');
@@ -29,7 +29,7 @@ function loadTheme(): Theme {
   }
   return 'system';
 }
-const DEFAULT_CITY: GeoHit = { name: 'Berlin', country: 'Deutschland', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' };
+const DEFAULT_CITY: GeoHit = { name: 'Berlin', country: 'Germany', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' };
 
 function loadCity(): GeoHit {
   try {
@@ -117,18 +117,19 @@ export default function App() {
     <div className="frame">
       <header className="top">
         <div className="brand">
+          <a className="back" href="./">← Scenarios</a>
           <span className="name">FutureWeather</span>
-          <span className="tag">{DAYS_SHOWN} Tage aus der Historie allein · TimesFM 3.0 gegen ein Wettermodell</span>
+          <span className="tag">{DAYS_SHOWN} days from the history alone · TimesFM 3.0 against a weather model</span>
         </div>
         <Search onPick={pick} />
         <div className="topRight">
           {data && (
             <span className="num">
-              Stand {data.generated.replace('T', ' ')} · Kontext {data.contextHours} h · {(data.runtimeMs / 1000).toFixed(1)} s
+              Updated {data.generated.replace('T', ' ')} · context {data.contextHours} h · {(data.runtimeMs / 1000).toFixed(1)} s
             </span>
           )}
-          {loading && <span className="loading">lädt …</span>}
-          <button className="pillBtn" onClick={cycleTheme} aria-label={`Farbschema: ${THEME_LABEL[theme]}, wechseln`} title="Farbschema wechseln">
+          {loading && <span className="loading">loading …</span>}
+          <button className="pillBtn" onClick={cycleTheme} aria-label={`Colour scheme: ${THEME_LABEL[theme]}, switch`} title="Switch colour scheme">
             {theme === 'dark' ? '☾' : theme === 'light' ? '☀' : '◐'} {THEME_LABEL[theme]}
           </button>
         </div>
@@ -136,13 +137,13 @@ export default function App() {
 
       {error === 'down' && !data ? (
         <section className="raised state" aria-live="polite">
-          <h2>Der Vorhersage-Server läuft nicht</h2>
-          <p>Die Seite rechnet live mit TimesFM 3.0. Server im Projektordner starten, dann neu laden:</p>
+          <h2>The forecast server is not running</h2>
+          <p>The page computes live with TimesFM 3.0. Start the server in the project folder, then reload:</p>
           <code>.venv/bin/python weather/server.py</code>
         </section>
       ) : error && !data ? (
         <section className="raised state" aria-live="polite">
-          <h2>Keine Vorhersage</h2>
+          <h2>No forecast</h2>
           <p>{error}</p>
         </section>
       ) : data ? (
@@ -152,16 +153,16 @@ export default function App() {
             <DayCards data={data} source={source} selected={selected} onSelect={setSelected} days={DAYS_SHOWN} />
             <Duel err={data.expectedError} hind={data.hindcast} days={DAYS_SHOWN} source={source} onOpen={() => setPopup(true)} />
           </div>
-          <section className={`chartPanel${loading ? ' skeleton' : ''}`} aria-label="Stundenkurve">
+          <section className={`chartPanel${loading ? ' skeleton' : ''}`} aria-label="Hourly curve">
             <div className="chartHead">
-              <span className="label">Stündliche Temperatur · 14 Tage zurück, {DAYS_SHOWN} Tage voraus</span>
+              <span className="label">Hourly temperature · 14 days back, {DAYS_SHOWN} days ahead</span>
               <div className="legend">
                 <span>
-                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> gemessen
+                  <i className="swatch" style={{ color: 'var(--c-history)' }} /> measured
                 </span>
                 {data.hindcast && (
-                  <span title={`${data.hindcast.runs} Läufe à ${data.hindcastDays} Tage, gestartet am ${data.hindcast.origins.map((o) => o.slice(5, 10)).join(', ')}`}>
-                    <i className="swatch dashed" style={{ color: 'var(--muted)' }} /> damals vorhergesagt
+                  <span title={`${data.hindcast.runs} runs of ${data.hindcastDays} days, started on ${data.hindcast.origins.map((o) => o.slice(5, 10)).join(', ')}`}>
+                    <i className="swatch dashed" style={{ color: 'var(--muted)' }} /> predicted back then
                   </span>
                 )}
                 {source !== 'nwp' && (
@@ -171,7 +172,7 @@ export default function App() {
                 )}
                 {source !== 'timesfm' && (
                   <span>
-                    <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Wettermodell (Open-Meteo)
+                    <i className="swatch" style={{ color: 'var(--c-nwp)' }} /> Weather model (Open-Meteo)
                   </span>
                 )}
               </div>
@@ -182,8 +183,8 @@ export default function App() {
         </>
       ) : (
         <section className="raised state" aria-live="polite">
-          <h2>Berechne Vorhersage …</h2>
-          <p>TimesFM 3.0 rechnet auf der CPU, das dauert ein paar Sekunden.</p>
+          <h2>Computing the forecast …</h2>
+          <p>TimesFM 3.0 runs on the CPU, this takes a few seconds.</p>
         </section>
       )}
     </div>

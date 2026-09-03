@@ -10,13 +10,13 @@ interface Props {
 /** The seven backtest cities: shown as a quick pick when the field is focused but still empty,
  * because for these the honesty chip has measured numbers of their own. */
 const QUICK: GeoHit[] = [
-  { name: 'Berlin', country: 'Deutschland', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' },
-  { name: 'Reykjavík', country: 'Island', admin1: null, lat: 64.1355, lon: -21.8954, tz: 'Atlantic/Reykjavik' },
-  { name: 'Phoenix', country: 'Vereinigte Staaten', admin1: 'Arizona', lat: 33.4484, lon: -112.074, tz: 'America/Phoenix' },
-  { name: 'Singapur', country: 'Singapur', admin1: null, lat: 1.2897, lon: 103.8501, tz: 'Asia/Singapore' },
-  { name: 'Kapstadt', country: 'Südafrika', admin1: 'Westkap', lat: -33.9258, lon: 18.4232, tz: 'Africa/Johannesburg' },
-  { name: 'Denver', country: 'Vereinigte Staaten', admin1: 'Colorado', lat: 39.7392, lon: -104.9847, tz: 'America/Denver' },
-  { name: 'Tokio', country: 'Japan', admin1: null, lat: 35.6895, lon: 139.6917, tz: 'Asia/Tokyo' },
+  { name: 'Berlin', country: 'Germany', admin1: 'Land Berlin', lat: 52.52437, lon: 13.41053, tz: 'Europe/Berlin' },
+  { name: 'Reykjavík', country: 'Iceland', admin1: null, lat: 64.1355, lon: -21.8954, tz: 'Atlantic/Reykjavik' },
+  { name: 'Phoenix', country: 'United States', admin1: 'Arizona', lat: 33.4484, lon: -112.074, tz: 'America/Phoenix' },
+  { name: 'Singapore', country: 'Singapore', admin1: null, lat: 1.2897, lon: 103.8501, tz: 'Asia/Singapore' },
+  { name: 'Cape Town', country: 'South Africa', admin1: 'Western Cape', lat: -33.9258, lon: 18.4232, tz: 'Africa/Johannesburg' },
+  { name: 'Denver', country: 'United States', admin1: 'Colorado', lat: 39.7392, lon: -104.9847, tz: 'America/Denver' },
+  { name: 'Tokyo', country: 'Japan', admin1: null, lat: 35.6895, lon: 139.6917, tz: 'Asia/Tokyo' },
 ];
 
 /** Sunken search pill with a debounced (250 ms) geocoder list; arrow keys + Enter.
@@ -85,8 +85,8 @@ export default function Search({ onPick }: Props) {
         <input
           ref={inputRef}
           value={q}
-          placeholder="Stadt suchen …"
-          aria-label="Stadt suchen"
+          placeholder="Search a city …"
+          aria-label="Search a city"
           aria-autocomplete="list"
           aria-controls="citylist"
           onChange={(e) => setQ(e.target.value)}
@@ -97,7 +97,7 @@ export default function Search({ onPick }: Props) {
       </div>
       {open && list.length > 0 && (
         <ul className="suggest" id="citylist" role="listbox">
-          {term.length < 2 && <li className="suggestHead">Städte mit eigenem Backtest</li>}
+          {term.length < 2 && <li className="suggestHead">Cities with their own backtest</li>}
           {list.map((h, i) => (
             <li
               key={`${h.lat},${h.lon}`}

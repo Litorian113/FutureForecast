@@ -17,9 +17,9 @@ const PAD = { top: 18, right: 20, bottom: 34, left: 48 };
 export default function ErrorPopup({ err, onClose }: Props) {
   if (!err) {
     return (
-      <Modal title="Erwarteter Fehler" subtitle="Kein Backtest gefunden" onClose={onClose}>
+      <Modal title="Expected error" subtitle="No backtest found" onClose={onClose}>
         <p className="note">
-          Der Server hat public/data/backtest.json nicht gefunden. Ausführen: <code>.venv/bin/python weather/backtest.py</code>
+          The server did not find public/data/backtest.json. Run <code>.venv/bin/python weather/backtest.py</code>
         </p>
       </Modal>
     );
@@ -35,11 +35,11 @@ export default function ErrorPopup({ err, onClose }: Props) {
 
   return (
     <Modal
-      title="Erwarteter Temperaturfehler je Vorlauftag"
-      subtitle={`Backtest ${err.city} ${err.year}, ${err.cutoffs} Cutoffs alle 2 Tage, mittlerer absoluter Fehler (MAE) der stündlichen 2-m-Temperatur gegen ERA5`}
+      title="Expected temperature error by lead day"
+      subtitle={`Backtest ${err.city} ${err.year}, ${err.cutoffs} cutoffs every 2 days, mean absolute error (MAE) of the hourly 2 m temperature against ERA5`}
       onClose={onClose}
     >
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="MAE je Vorlauftag">
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="MAE by lead day">
         <g className="axis">
           {ticks.map((t) => (
             <g key={t}>
@@ -51,7 +51,7 @@ export default function ErrorPopup({ err, onClose }: Props) {
           ))}
           {[1, 2, 3, 4, 5, 6, 7].map((l) => (
             <text key={l} x={x(l)} y={H - 12} textAnchor="middle">
-              Tag {l}
+              Day {l}
             </text>
           ))}
           <text x={PAD.left - 8} y={PAD.top - 6} textAnchor="end" style={{ fontSize: 10 }}>
@@ -72,9 +72,9 @@ export default function ErrorPopup({ err, onClose }: Props) {
       <table className="errTable">
         <thead>
           <tr>
-            <th>Modell</th>
+            <th>Model</th>
             {[1, 2, 3, 4, 5, 6, 7].map((l) => (
-              <th key={l}>Tag {l}</th>
+              <th key={l}>Day {l}</th>
             ))}
             <th>Skill</th>
             <th>Symbol</th>
@@ -106,9 +106,9 @@ export default function ErrorPopup({ err, onClose }: Props) {
         </tbody>
       </table>
       <p className="note">
-        Skill = 1 − MAE/MAE<sub>Klimatologie</sub> (0 = so gut wie das langjährige Mittel, 1 = perfekt). Symbol = Trefferquote der
-        fünf Wetterklassen je Tag. Band = Anteil der Stunden, in denen die Wahrheit im 10–90-%-Band liegt (Ziel 80 %). Die
-        Zahlen stammen aus dem Backtest der klimatisch nächsten Test-Stadt, nicht vom gesuchten Ort.
+        Skill = 1 − MAE/MAE<sub>climatology</sub> (0 = as good as the long-term mean, 1 = perfect). Symbol = hit rate of the
+        five weather classes per day. Band = share of hours in which the truth lies inside the 10–90 % band (target 80 %).
+        The numbers come from the backtest of the climatically closest test city, not from the place you searched.
       </p>
     </Modal>
   );
