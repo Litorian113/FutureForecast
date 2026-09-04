@@ -4,6 +4,29 @@
 export default function Hub() {
   return (
     <main className="hub">
+      {/* a few handwritten margin notes in the empty space, decorative only */}
+      <div className="notes" aria-hidden="true">
+        <span className="note n1">
+          zero‑shot
+          <svg viewBox="0 0 120 14" className="squiggle">
+            <path d="M3 9 C 20 2, 34 14, 52 7 S 84 2, 116 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </span>
+        <span className="note n2">no training, no tuning</span>
+        <span className="note n3">
+          300 M params
+          <br />
+          runs on a laptop
+        </span>
+        <span className="note n4">
+          history in
+          <svg viewBox="0 0 70 30" className="smallArrow">
+            <path d="M4 22 C 20 26, 44 24, 62 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M52 8 L 63 7 L 60 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          future out
+        </span>
+      </div>
       <header className="hubHead">
         <h1>Three experiments with a time‑series foundation model</h1>
         <p>
