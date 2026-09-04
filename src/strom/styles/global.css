@@ -1,16 +1,16 @@
 :root {
   color-scheme: dark;
-  --bg: #0a0a0a;
+  --bg: #14141e;
   --dot: rgba(255, 255, 255, 0.07);
   --panel: rgba(255, 255, 255, 0.035);
   --panel-border: rgba(255, 255, 255, 0.09);
-  --panel-solid: #141414;
+  --panel-solid: #1c1c28;
   --text: #ffffff;
   --text-2: #c3c2b7;
   --muted: #898781;
   --faint: #4a4a48;
-  --grid: #262624;
-  --axis: #383835;
+  --grid: #262634;
+  --axis: #3a3a4a;
   --accent: #b9cfe0;
   --truth: #ffffff;
   --history: #8a8a86;
@@ -490,6 +490,9 @@ button {
   min-height: 0;
   height: 100%;
   overflow: hidden;
+  /* solid ground so the page's dot pattern does not show through behind the curves */
+  background: var(--bg);
+  border-radius: 12px;
 }
 
 .chartScroll {
@@ -511,7 +514,7 @@ button {
   top: 0;
   bottom: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(10, 10, 10, 0.95) 60%, rgba(10, 10, 10, 0));
+  background: linear-gradient(90deg, var(--bg) 60%, rgba(20, 20, 30, 0));
 }
 
 .yAxis svg {
@@ -645,7 +648,7 @@ button {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(22, 22, 22, 0.9);
+  background: rgba(28, 28, 40, 0.9);
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   padding: 6px 10px;
