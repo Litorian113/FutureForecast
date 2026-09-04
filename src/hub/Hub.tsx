@@ -5,12 +5,19 @@ export default function Hub() {
   return (
     <main className="hub">
       <header className="hubHead">
-        <h1>Three experiments with a time-series foundation model</h1>
+        <h1>Three experiments with a time‑series foundation model</h1>
         <p>
           I tried Google's <b>TimesFM 3.0</b> on three things I had data for: earthquakes, electricity demand and the
           weather. No training, just the past values of each series as input. Each time I compared it with the method
-          people normally use, to see where it helps and where it does not. Pick one:
+          people normally use, to see where it helps and where it does not.
         </p>
+        <div className="pickNote" aria-hidden="true">
+          <span>pick one</span>
+          <svg viewBox="0 0 60 70" className="pickArrow">
+            <path d="M8 4 C 30 10, 44 30, 40 62" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            <path d="M30 52 L 40 63 L 49 51" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </header>
 
       <nav className="tiles" aria-label="Scenarios">
