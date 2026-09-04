@@ -745,13 +745,33 @@ export default function Globe() {
                 reset
               </button>
             </div>
-            <div className="legendRow">
-              <span className="legendLabel">M 5.5</span>
-              <span className="gradientBar" />
-              <span className="legendLabel">M 8+</span>
+          </div>
+          <div className="keyBlock">
+            <div className="keyRow">
+              <div className="keyHead">
+                <span className="keyDot hist" />
+                Historical
+              </div>
+              <span className="keyBar hist" />
+              <div className="keyScale">
+                <span>M 5.5</span>
+                <span>M 8+</span>
+              </div>
+              <div className="keySub">23,000 quakes measured since 1965</div>
+            </div>
+            <div className="keyRow">
+              <div className="keyHead">
+                <span className="keyDot pred" />
+                Predicted
+              </div>
+              <span className="keyBar pred" />
+              <div className="keyScale">
+                <span>M 5.5</span>
+                <span>M 8+</span>
+              </div>
+              <div className="keySub">sampled by TimesFM for 2017–2026</div>
             </div>
           </div>
-          <div className="note">Orange to red: historical quakes by magnitude. Green: sampled predictions, brighter for stronger.</div>
         </aside>
       ) : (
         <button type="button" className="globePanelToggle leftToggle ghostBtn" onClick={() => setLeftOpen(true)}>
@@ -790,9 +810,6 @@ export default function Globe() {
 
           {currentSection && (
             <>
-              <div className="secHint">
-                <span>{currentSection.hint}</span>
-              </div>
               <div className="list" role="listbox" aria-label={currentSection.title}>
                 {currentSection.items.map((it) => {
                   const isSel = selected === it.key;
@@ -878,10 +895,7 @@ export default function Globe() {
             </div>
           )}
 
-          <div className="note">
-            Green dots are sampled from the forecast rates: TimesFM predicts <i>how many</i> quakes a region gets, each dot's
-            magnitude comes from that region's own history. Click an entry to turn the globe there, ↑ ↓ to step.
-          </div>
+
         </aside>
       ) : (
         <button type="button" className="globePanelToggle ghostBtn" onClick={() => setPanelOpen(true)}>
