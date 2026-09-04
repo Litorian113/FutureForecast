@@ -156,7 +156,7 @@ export default function Chart({ record, visible }: Props) {
               key={`band${m}`}
               d={`${path(upper)}L${lower.map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`).join('L')}Z`}
               fill={st.color}
-              opacity={st.family === 'timesfm' ? 0.2 : 0.09}
+              opacity={st.family === 'timesfm' ? 0.13 : 0.07}
             />
           );
         })}

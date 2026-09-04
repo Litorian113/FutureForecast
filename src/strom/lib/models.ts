@@ -50,7 +50,7 @@ export const MODEL_STYLES: Record<string, ModelStyle> = {
     short: 'STL+ETS',
     color: '#3987e5',
     family: 'classic',
-    defaultVisible: true,
+    defaultVisible: false,
     description: 'STL (168 h) seasonal repeated, remainder with damped Holt.',
   },
   timesfm: {
@@ -58,7 +58,7 @@ export const MODEL_STYLES: Record<string, ModelStyle> = {
     short: 'TimesFM',
     color: '#199e70',
     family: 'timesfm',
-    defaultVisible: true,
+    defaultVisible: false,
     description: 'Zero-shot, 8-week context, no training.',
   },
   timesfm_long: {
