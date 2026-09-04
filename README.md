@@ -37,6 +37,12 @@ A start page and three sub-pages, each in its own design. Everything runs locall
 **Weather**: the only page that computes live. Search a city and TimesFM forecasts the next five days on the
 CPU in a few seconds, next to the weather model from Open-Meteo. The dashed lines in the past are what both
 said five days ago, laid over what actually happened, so you can see for yourself where each one was off.
+The panel on the right compares the two, and the chip under the temperature opens the full backtest table.
+
+| | |
+|---|---|
+| ![Weather in dark mode](docs/screenshot-dark.png) | ![Expected error by lead day](docs/popup.png) |
+| The same page in dark mode | Every method's error per lead day, from the backtest |
 
 ## How I tested it
 
