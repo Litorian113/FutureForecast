@@ -379,10 +379,10 @@ body {
 }
 
 .note.n4 {
-  left: -118px;
+  left: -122px;
   top: 300px;
   font-size: 22px;
-  align-items: center;
+  line-height: 1.1;
   transform: rotate(-7deg);
 }
 
@@ -392,10 +392,18 @@ body {
   margin-top: -2px;
 }
 
-.smallArrow {
-  width: 62px;
-  height: 26px;
-  margin: 2px 0;
+.scribble {
+  position: absolute;
+  color: #6f7890;
+  opacity: 0.85;
+}
+
+/* the margin scribbles only make sense where there is a margin */
+@media (max-width: 1460px) {
+  .scribble.star:nth-of-type(n + 7),
+  .scribble.sparkle:nth-of-type(n + 7) {
+    display: none;
+  }
 }
 
 /* lower margins, left and right of the cards; only where there is room for them */

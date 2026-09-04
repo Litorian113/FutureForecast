@@ -1,3 +1,20 @@
+type Scribble = { kind: 'star' | 'sparkle'; size: number; rot: number; left?: number | string; right?: number | string; top?: number | string; bottom?: number | string };
+
+/** Hand-drawn stars and sparkles that keep the handwritten notes company in the margins. */
+const STARS: Scribble[] = [
+  { kind: 'star', size: 22, rot: -12, left: 246, top: 34 },
+  { kind: 'sparkle', size: 14, rot: 20, left: 118, top: 120 },
+  { kind: 'star', size: 16, rot: 25, left: 228, top: 206 },
+  { kind: 'sparkle', size: 12, rot: 0, right: 60, top: 108 },
+  { kind: 'star', size: 20, rot: 14, right: 288, top: 40 },
+  { kind: 'sparkle', size: 16, rot: 35, right: 22, top: 62 },
+  { kind: 'star', size: 18, rot: -20, left: -84, top: 250 },
+  { kind: 'sparkle', size: 12, rot: 10, left: -30, top: 372 },
+  { kind: 'star', size: 15, rot: 30, right: -70, bottom: 230 },
+  { kind: 'sparkle', size: 14, rot: -15, right: -34, bottom: 120 },
+  { kind: 'star', size: 17, rot: 8, left: -46, bottom: 96 },
+];
+
 /** Start page: one tile per scenario, each drawn in the design language of the page it opens.
  * The three scenarios ask the same question of the same model - TimesFM 3.0, zero-shot, from the
  * history alone - and get three different answers. */
@@ -19,13 +36,32 @@ export default function Hub() {
           CPU only
         </span>
         <span className="note n4">
-          history in
-          <svg viewBox="0 0 70 30" className="smallArrow">
-            <path d="M4 22 C 20 26, 44 24, 62 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M52 8 L 63 7 L 60 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          history in,
+          <br />
           forecast out
         </span>
+        {/* scribbled stars and sparkles scattered near the notes */}
+        {STARS.map((st, i) => (
+          <svg
+            key={i}
+            className={`scribble ${st.kind}`}
+            viewBox="0 0 24 24"
+            style={{ left: st.left, right: st.right, top: st.top, bottom: st.bottom, width: st.size, height: st.size, transform: `rotate(${st.rot}deg)` }}
+          >
+            {st.kind === 'star' ? (
+              <path
+                d="M12 2.5 L14.6 9.2 L21.5 9.6 L16.1 14 L18.2 21 L12 17.2 L5.8 21 L7.9 14 L2.5 9.6 L9.4 9.2 Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            ) : (
+              <path d="M12 3 C 12.4 9, 12.4 9, 12 21 M3 12 C 9 11.6, 9 11.6, 21 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            )}
+          </svg>
+        ))}
         <span className="note n5">
           1,385 test
           <br />

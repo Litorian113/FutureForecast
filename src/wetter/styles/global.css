@@ -417,7 +417,7 @@ button {
 .days {
   display: grid;
   gap: 14px;
-  align-self: start;
+  align-self: end;
 }
 
 .day {
