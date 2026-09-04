@@ -305,9 +305,13 @@ export default function Globe() {
   const histMaterialsRef = useRef<THREE.PointsMaterial[]>([]);
   const markersRef = useRef<{ real: THREE.Mesh; pred: THREE.Mesh; arc: THREE.Line } | null>(null);
   const focusTargetRef = useRef<THREE.Vector3 | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const [showForecast, setShowForecast] = useState(true);
   const [histOpacity, setHistOpacity] = useState(1);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [leftOpen, setLeftOpen] = useState(() => window.innerWidth > 900); // collapsed on phones
+  const [autoRotate, setAutoRotate] = useState(false);
   const [openSection, setOpenSection] = useState<string>('pairs');
   const [selected, setSelected] = useState<string | null>(null);
   const [hover, setHover] = useState<{ item: HoverItem; x: number; y: number } | null>(null);
@@ -336,6 +340,9 @@ export default function Globe() {
     controls.enableZoom = true;
     controls.minDistance = RADIUS + 0.5;
     controls.maxDistance = 40;
+    controls.autoRotateSpeed = 0.6;
+    controlsRef.current = controls;
+    cameraRef.current = camera;
 
     // ---- space around the globe: a sparse, slowly drifting star field.
     const space = new THREE.Group();
@@ -559,6 +566,8 @@ export default function Globe() {
       renderer.domElement.removeEventListener('pointermove', onMove);
       renderer.domElement.removeEventListener('pointerleave', onLeave);
       controls.dispose();
+      controlsRef.current = null;
+      cameraRef.current = null;
       scene.traverse((o) => {
         if (o instanceof THREE.Points) {
           o.geometry.dispose();
@@ -633,6 +642,21 @@ export default function Globe() {
     }
   };
 
+  useEffect(() => {
+    if (controlsRef.current) controlsRef.current.autoRotate = autoRotate;
+  }, [autoRotate]);
+
+  const resetView = () => {
+    const c = controlsRef.current;
+    const cam = cameraRef.current;
+    if (!c || !cam) return;
+    focusTargetRef.current = null;
+    cam.position.set(0, 0, CAMERA_Z);
+    c.target.set(0, 0, 0);
+    c.update();
+    clearSelection();
+  };
+
   // Step through the open list with the arrow keys.
   const currentSection = insights?.sections.find((sec) => sec.key === openSection) ?? null;
   const step = (delta: number) => {
@@ -674,18 +698,17 @@ export default function Globe() {
       {!data && <Loader />}
       <div ref={mountRef} className="stage" />
 
-      {data?.forecast && insights && (panelOpen ? (
-        <aside className="globePanel">
+      {data?.forecast && insights && (leftOpen ? (
+        <aside className="globePanel left">
           <div className="panelHead">
             <div>
-              <div className="panelTitle">Predictions</div>
-              <div className="panelSub">TimesFM 3.0 · {data.forecast.meta.years[0]}–{insights.lastYear}</div>
+              <div className="panelTitle">Layers</div>
+              <div className="panelSub">what the globe shows</div>
             </div>
-            <button type="button" className="iconBtn" onClick={() => setPanelOpen(false)} aria-label="Hide panel" title="Hide panel">
+            <button type="button" className="iconBtn" onClick={() => setLeftOpen(false)} aria-label="Hide layers" title="Hide layers">
               ×
             </button>
           </div>
-
           <div className="controls">
             <label className="ctrl">
               <span className="ctrlLabel">Predicted quakes</span>
@@ -709,12 +732,45 @@ export default function Globe() {
                 <span className="ctrlValue">{Math.round(histOpacity * 100)} %</span>
               </span>
             </label>
+            <label className="ctrl">
+              <span className="ctrlLabel">Auto‑rotate</span>
+              <span className="switch small">
+                <input type="checkbox" checked={autoRotate} onChange={(e) => setAutoRotate(e.target.checked)} aria-label="Auto-rotate the globe" />
+                <span className="knob" />
+              </span>
+            </label>
+            <div className="ctrl">
+              <span className="ctrlLabel">View</span>
+              <button type="button" className="ghostBtn" onClick={resetView}>
+                reset
+              </button>
+            </div>
             <div className="legendRow">
               <span className="legendLabel">M 5.5</span>
               <span className="gradientBar" />
               <span className="legendLabel">M 8+</span>
             </div>
           </div>
+          <div className="note">Orange to red: historical quakes by magnitude. Green: sampled predictions, brighter for stronger.</div>
+        </aside>
+      ) : (
+        <button type="button" className="globePanelToggle leftToggle ghostBtn" onClick={() => setLeftOpen(true)}>
+          Layers ›
+        </button>
+      ))}
+
+      {data?.forecast && insights && (panelOpen ? (
+        <aside className="globePanel">
+          <div className="panelHead">
+            <div>
+              <div className="panelTitle">Predictions</div>
+              <div className="panelSub">TimesFM 3.0 · {data.forecast.meta.years[0]}–{insights.lastYear}</div>
+            </div>
+            <button type="button" className="iconBtn" onClick={() => setPanelOpen(false)} aria-label="Hide panel" title="Hide panel">
+              ×
+            </button>
+          </div>
+
 
           <div className="tabs" role="tablist" aria-label="Prediction lists">
             {insights.sections.map((sec) => (

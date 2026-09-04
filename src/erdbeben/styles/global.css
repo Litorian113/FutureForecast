@@ -1908,3 +1908,42 @@ select {
   background: rgba(61, 220, 132, 0.25);
   color: #d9ffe9;
 }
+
+/* ==================== left panel: layers / view ==================== */
+.globePanel.left {
+  left: 12px;
+  right: auto;
+  top: 78px;
+  bottom: auto;
+  width: 272px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  animation: none;
+}
+
+.globePanelToggle.leftToggle {
+  left: 12px;
+  right: auto;
+  top: 78px;
+}
+
+.globePanel .ctrl .ghostBtn {
+  padding: 3px 10px;
+}
+
+.globePanel.left input[type='range'] {
+  width: 100px;
+}
+
+@media (max-width: 900px) {
+  .globePanel.left {
+    top: 70px;
+    width: 220px;
+    max-height: 38vh;
+  }
+
+  .globePanelToggle.leftToggle {
+    top: 70px;
+    bottom: auto;
+  }
+}
