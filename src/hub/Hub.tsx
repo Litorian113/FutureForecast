@@ -13,9 +13,16 @@ export default function Hub() {
         </p>
         <div className="pickNote" aria-hidden="true">
           <span>pick one</span>
-          <svg viewBox="0 0 60 70" className="pickArrow">
-            <path d="M8 4 C 30 10, 44 30, 40 62" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-            <path d="M30 52 L 40 63 L 49 51" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg viewBox="0 0 140 120" className="pickArrow">
+            {/* a loose hand-drawn swoosh: out to the right, around, and back down onto the cards */}
+            <path
+              d="M6 10 C 60 -6, 128 10, 126 46 C 124 76, 88 88, 58 78 C 44 73, 36 66, 30 58"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <path d="M42 62 L 29 57 L 34 71" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </header>

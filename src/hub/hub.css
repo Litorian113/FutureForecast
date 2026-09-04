@@ -70,11 +70,11 @@ body {
 /* a handwritten "pick one" beside the intro, pointing down at the cards */
 .pickNote {
   position: absolute;
-  right: -150px;
-  bottom: -34px;
+  right: -190px;
+  bottom: -46px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0;
   color: #cfd6e6;
   font-family: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive;
@@ -86,10 +86,10 @@ body {
 }
 
 .pickArrow {
-  width: 44px;
-  height: 52px;
-  margin-top: 2px;
-  transform: rotate(6deg);
+  width: 118px;
+  height: 100px;
+  margin: -6px 0 0 8px;
+  transform: rotate(4deg);
 }
 
 @media (max-width: 1100px) {
@@ -103,9 +103,10 @@ body {
   }
 
   .pickArrow {
-    width: 26px;
-    height: 30px;
-    transform: rotate(-30deg);
+    width: 48px;
+    height: 40px;
+    margin: 0;
+    transform: rotate(50deg);
   }
 }
 
