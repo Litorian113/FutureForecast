@@ -10,12 +10,6 @@ interface Props {
   days: number;
 }
 
-const SENTENCE: Record<Source, (d: number) => string> = {
-  timesfm: (d) => `Next ${d} days from the history alone`,
-  nwp: (d) => `Next ${d} days from the weather model`,
-  both: (d) => `Next ${d} days: history alone next to the weather model`,
-};
-
 /** Expected temperature error of the shown source at lead day 1 and `days`, from the backtest of
  * the climatically closest test city. TimesFM on the page is the 6-variate variant. */
 export function expectedLine(
@@ -45,7 +39,6 @@ export default function Hero({ data, source, onSource, onChip, days }: Props) {
       </div>
       <WeatherIcon kind={data.current.icon} className="nowIcon" title={`now: ${data.current.icon}`} />
       <div className="sentence">
-        <span>{SENTENCE[source](days)}</span>
         <div className="seg" role="group" aria-label="Source">
           {(['timesfm', 'nwp', 'both'] as Source[]).map((s) => (
             <button key={s} aria-pressed={source === s} onClick={() => onSource(s)}>

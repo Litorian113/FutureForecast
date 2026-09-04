@@ -398,6 +398,8 @@ body {
   margin: 2px 0;
 }
 
+}
+
 @media (max-width: 1460px) {
   .note.n4 {
     display: none;
@@ -411,9 +413,25 @@ body {
 }
 
 /* ---------- foot ---------- */
+.footNote {
+  font-family: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive;
+  font-weight: 600;
+  font-size: 21px;
+  color: #8f97ab;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .footNote {
+    display: none;
+  }
+}
+
 .hubFoot {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
   padding-top: 16px;
   border-top: 1px solid var(--line);

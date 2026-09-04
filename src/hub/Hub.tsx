@@ -12,11 +12,11 @@ export default function Hub() {
             <path d="M3 9 C 20 2, 34 14, 52 7 S 84 2, 116 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </span>
-        <span className="note n2">no training, no tuning</span>
+        <span className="note n2">no training involved</span>
         <span className="note n3">
-          300 M params
+          300 M parameters
           <br />
-          runs on a laptop
+          CPU only
         </span>
         <span className="note n4">
           history in
@@ -24,7 +24,7 @@ export default function Hub() {
             <path d="M4 22 C 20 26, 44 24, 62 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             <path d="M52 8 L 63 7 L 60 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          future out
+          forecast out
         </span>
       </div>
       <header className="hubHead">
@@ -89,6 +89,7 @@ export default function Hub() {
 
       <footer className="hubFoot">
         <span>Rolling-origin backtests · every model sees only data before the cutoff · TimesFM 3.0 weights are non-commercial</span>
+        <span className="footNote" aria-hidden="true">same model, three data sets</span>
         <span>Franz Anhäupl · HfG Schwäbisch Gmünd</span>
       </footer>
     </main>

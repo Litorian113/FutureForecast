@@ -493,41 +493,50 @@ button {
   font-size: 11.5px;
 }
 
-/* both sources: two equal rows, separated by a hairline, each headed by its colour */
+/* both sources: two blocks that share the card's height evenly, each headed by its colour */
+.day.split {
+  justify-content: space-between;
+}
+
+.day.split .head {
+  padding-bottom: 8px;
+}
+
 .day.split .row {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   border-top: 1px solid var(--grid);
-  padding: 11px 0 2px;
+  padding: 10px 0 6px;
   min-width: 0;
 }
 
 .day.split .row .src {
   font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .day.split .row .icon {
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
 }
 
 .day.split .row .hi {
-  font-size: 20px;
+  font-size: 26px;
 }
 
 .day.split .row .lo {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .day.split .row .rain {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
 /* ---------- chart panel ---------- */
