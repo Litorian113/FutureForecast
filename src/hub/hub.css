@@ -437,22 +437,6 @@ body {
 }
 
 /* ---------- foot ---------- */
-.footNote {
-  font-family: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive;
-  font-weight: 600;
-  font-size: 19px;
-  line-height: 1;
-  color: #8f97ab;
-  transform: rotate(-2deg);
-  white-space: nowrap;
-}
-
-@media (max-width: 1100px) {
-  .footNote {
-    display: none;
-  }
-}
-
 .hubFoot {
   display: flex;
   justify-content: space-between;

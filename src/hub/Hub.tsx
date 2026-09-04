@@ -27,14 +27,14 @@ export default function Hub() {
           forecast out
         </span>
         <span className="note n5">
-          1,281 + 104
+          1,385 test
           <br />
           forecasts
         </span>
         <span className="note n6">
-          nothing peeks
+          same model,
           <br />
-          at the future
+          three data sets
         </span>
       </div>
       <header className="hubHead">
@@ -99,7 +99,6 @@ export default function Hub() {
 
       <footer className="hubFoot">
         <span>Rolling-origin backtests · every model sees only data before the cutoff · TimesFM 3.0 weights are non-commercial</span>
-        <span className="footNote" aria-hidden="true">same model, three data sets</span>
         <span>Franz Anhäupl · HfG Schwäbisch Gmünd</span>
       </footer>
     </main>
