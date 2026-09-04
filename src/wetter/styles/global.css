@@ -30,14 +30,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #232730;
-    --sh-dark: #1b1e25;
-    --sh-light: #2b303b;
+    --bg: #14141e;
+    --sh-dark: #0b0b12;
+    --sh-light: #1e1e2b;
     --text: #eef1f6;
     --text-2: #c6ccd8;
     --muted: #a3abba;
     --faint: #6b7385;
-    --grid: #2f3441;
+    --grid: #262634;
     --c-timesfm: #86adff;
     --c-timesfm-fill: rgba(134, 173, 255, 0.18);
     --c-nwp: #f2a25e;
@@ -51,14 +51,14 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #232730;
-  --sh-dark: #1b1e25;
-  --sh-light: #2b303b;
+  --bg: #14141e;
+  --sh-dark: #0b0b12;
+  --sh-light: #1e1e2b;
   --text: #eef1f6;
   --text-2: #c6ccd8;
   --muted: #a3abba;
   --faint: #6b7385;
-  --grid: #2f3441;
+  --grid: #262634;
   --c-timesfm: #86adff;
   --c-timesfm-fill: rgba(134, 173, 255, 0.18);
   --c-nwp: #f2a25e;
@@ -159,11 +159,14 @@ button {
 
 .brand .back {
   color: var(--muted);
-  font-size: 10.5px;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  margin-bottom: 2px;
+  padding: 6px 0 4px;
+  margin: -6px 0 0;
+  align-self: flex-start;
 }
 
 .brand .back:hover {

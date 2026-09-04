@@ -24,10 +24,9 @@ function Frame({ region, range, children }: { region: string; range: string; chi
   return (
     <div className="frame">
       <div className="corner">
-        <div>
+        <div className="brand">
           <a className="back" href="./">← Scenarios</a>
-          <div className="l1">FutureGrid</div>
-          <div className="l2">Load Forecast Benchmark</div>
+          <div className="name">FutureGrid</div>
         </div>
         <div className="right">
           <div className="l1">

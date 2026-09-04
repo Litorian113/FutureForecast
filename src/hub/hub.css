@@ -208,7 +208,7 @@ body {
 
 /* --- 03 weather: neumorphic, dark palette of the weather page --- */
 .tile.weather {
-  background: #232730;
+  background: #14141e;
   color: #eef1f6;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -228,7 +228,7 @@ body {
 }
 
 .tile.weather .open {
-  border-color: #2f3441;
+  border-color: #262634;
 }
 
 .wcard {
@@ -238,8 +238,8 @@ body {
   justify-content: space-between;
   padding: 22px 26px;
   border-radius: 24px;
-  background: #232730;
-  box-shadow: 8px 8px 16px #1b1e25, -8px -8px 16px #2b303b;
+  background: #14141e;
+  box-shadow: 8px 8px 16px #0b0b12, -8px -8px 16px #1e1e2b;
 }
 
 .wtemp {
@@ -254,7 +254,7 @@ body {
   width: 72px;
   height: 72px;
   color: #c6ccd8;
-  filter: drop-shadow(3px 3px 4px #1b1e25) drop-shadow(-3px -3px 4px #2b303b);
+  filter: drop-shadow(3px 3px 4px #0b0b12) drop-shadow(-3px -3px 4px #1e1e2b);
 }
 
 .wband {
