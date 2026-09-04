@@ -10,10 +10,12 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <a href="./" className="back">
-          ← Scenarios
-        </a>
-        <span className="title">Earthquakes &amp; Tsunamis · 3D model · TimesFM 3.0 forecast 2017–2026</span>
+        <div className="brand">
+          <a href="./" className="back">
+            ← Scenarios
+          </a>
+          <span className="name">FutureQuake</span>
+        </div>
       </header>
       <Suspense fallback={<Loader />}>
         <Globe />

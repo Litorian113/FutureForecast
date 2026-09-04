@@ -119,15 +119,9 @@ export default function App() {
         <div className="brand">
           <a className="back" href="./">← Scenarios</a>
           <span className="name">FutureWeather</span>
-          <span className="tag">{DAYS_SHOWN} days from the history alone · TimesFM 3.0 against a weather model</span>
         </div>
         <Search onPick={pick} />
         <div className="topRight">
-          {data && (
-            <span className="num">
-              Updated {data.generated.replace('T', ' ')} · context {data.contextHours} h · {(data.runtimeMs / 1000).toFixed(1)} s
-            </span>
-          )}
           {loading && <span className="loading">loading …</span>}
           <button className="pillBtn" onClick={cycleTheme} aria-label={`Colour scheme: ${THEME_LABEL[theme]}, switch`} title="Switch colour scheme">
             {theme === 'dark' ? '☾' : theme === 'light' ? '☀' : '◐'} {THEME_LABEL[theme]}
