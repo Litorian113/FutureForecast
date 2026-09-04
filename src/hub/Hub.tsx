@@ -26,6 +26,16 @@ export default function Hub() {
           </svg>
           forecast out
         </span>
+        <span className="note n5">
+          1,281 + 104
+          <br />
+          forecasts
+        </span>
+        <span className="note n6">
+          nothing peeks
+          <br />
+          at the future
+        </span>
       </div>
       <header className="hubHead">
         <h1>Three experiments with a time‑series foundation model</h1>

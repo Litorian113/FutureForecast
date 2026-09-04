@@ -398,6 +398,32 @@ body {
   margin: 2px 0;
 }
 
+/* lower margins, left and right of the cards; only where there is room for them */
+.note.n5 {
+  right: calc(100% - 22px);
+  bottom: 130px;
+  font-size: 22px;
+  line-height: 1.1;
+  align-items: flex-end;
+  text-align: right;
+  transform: rotate(-6deg);
+}
+
+.note.n6 {
+  left: calc(100% - 22px);
+  bottom: 160px;
+  font-size: 22px;
+  line-height: 1.1;
+  transform: rotate(5deg);
+}
+
+@media (max-width: 1600px) {
+  .note.n5,
+  .note.n6 {
+    display: none;
+  }
+}
+
 @media (max-width: 1460px) {
   .note.n4 {
     display: none;
