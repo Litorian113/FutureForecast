@@ -864,27 +864,6 @@ export default function Globe() {
                       <span>magnitude</span>
                     </div>
                   </div>
-                  <div className="pairLines">
-                    <div>
-                      <span className="ring white" />
-                      <span className="k">real</span>
-                      <span className="v">{selectedItem.facts[0]?.value}</span>
-                    </div>
-                    <div>
-                      <span className="ring green" />
-                      <span className="k">predicted</span>
-                      <span className="v">{selectedItem.facts[1]?.value}</span>
-                    </div>
-                    {selectedItem.facts
-                      .filter((f) => /region/i.test(f.label))
-                      .map((f) => (
-                        <div key={f.label}>
-                          <span className="ring none" />
-                          <span className="k">region</span>
-                          <span className="v">{f.value}</span>
-                        </div>
-                      ))}
-                  </div>
                 </>
               ) : (
                 <dl className="facts">
