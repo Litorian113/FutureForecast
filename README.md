@@ -197,7 +197,10 @@ in one batch came back as NaN without an error. Checking the data took longer th
 - The globe on the start page is drawn by hand; the real data only loads on the earthquake page.
 - Desktop only, laid out for 1440 × 900. The electricity and earthquake pages are dark-mode only.
 - Intel Macs need torch 2.2.2, hence `numpy<2` and the `RMSNorm` shim.
-- The TimesFM 3.0 weights are non-commercial; run it locally.
+- The TimesFM 3.0 weights are under the TimesFM Non-Commercial License v1.0: fine for testing, evaluation
+  and research, but not for revenue-generating use and not for serving end users. This repo therefore ships
+  no weights (they are downloaded on first run) and the live weather server is meant to run on your own
+  machine, not to be deployed publicly.
 
 ## Run it yourself
 
@@ -248,7 +251,8 @@ Python 3.12 with TimesFM 3.0 (PyTorch), pandas, FastAPI. Screenshots via headles
 
 ## Data and licences
 
-The code in this repository is under the [MIT licence](LICENSE).
+The code in this repository is under the [MIT licence](LICENSE). That covers my own code only, not the
+model weights, the data or the world map, which keep the licences listed below.
 
 | What | Source | Licence |
 |---|---|---|
