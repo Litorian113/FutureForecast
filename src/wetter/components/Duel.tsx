@@ -113,7 +113,7 @@ export default function Duel({ err, hind, days, onOpen }: Props) {
       ) : (
         <>
           <p className="duelNote">
-            TimesFM has not been backtested for {err.city} yet — the weather model scores{' '}
+            TimesFM has not been backtested for {err.city} yet. The weather model scores{' '}
             <b className="num">{nwp[0]?.toFixed(1)} °C</b> at day 1 and{' '}
             <b className="num">{nwp[days - 1]?.toFixed(1)} °C</b> at day {days} there. Measured right here, however:
           </p>
