@@ -11,22 +11,23 @@ export default function Hub() {
           weather. No training, just the past values of each series as input. Each time I compared it with the method
           people normally use, to see where it helps and where it does not.
         </p>
-        <div className="pickNote" aria-hidden="true">
-          <span>pick one</span>
-          <svg viewBox="0 0 140 120" className="pickArrow">
-            {/* a loose hand-drawn swoosh: out to the right, around, and back down onto the cards */}
-            <path
-              d="M6 10 C 60 -6, 128 10, 126 46 C 124 76, 88 88, 58 78 C 44 73, 36 66, 30 58"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-            <path d="M42 62 L 29 57 L 34 71" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
       </header>
 
+      <div className="tilesWrap">
+      <div className="pickNote" aria-hidden="true">
+        <span>pick one</span>
+        <svg viewBox="0 0 150 110" className="pickArrow">
+          {/* from the margin: down, around, and left into the card's edge */}
+          <path
+            d="M118 6 C 150 30, 148 78, 106 92 C 78 101, 46 92, 18 72"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+          />
+          <path d="M34 66 L 17 71 L 27 85" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
       <nav className="tiles" aria-label="Scenarios">
         <a className="tile quake" href="./erdbeben.html">
           <span className="no">01 · Earthquakes</span>
@@ -61,6 +62,7 @@ export default function Hub() {
           <span className="open">Open the forecast <i>→</i><small>Open-Meteo · ERA5 · 7 cities · 1,281 cutoffs</small></span>
         </a>
       </nav>
+      </div>
 
       <footer className="hubFoot">
         <span>Rolling-origin backtests · every model sees only data before the cutoff · TimesFM 3.0 weights are non-commercial</span>
