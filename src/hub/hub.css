@@ -35,8 +35,8 @@ body {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 20px;
-  padding: 26px 40px 18px;
+  gap: 18px;
+  padding: 24px 40px 14px;
   max-width: 1240px;
   margin: 0 auto;
 }
@@ -398,8 +398,6 @@ body {
   margin: 2px 0;
 }
 
-}
-
 @media (max-width: 1460px) {
   .note.n4 {
     display: none;
@@ -416,7 +414,8 @@ body {
 .footNote {
   font-family: 'Caveat', 'Bradley Hand', 'Segoe Script', cursive;
   font-weight: 600;
-  font-size: 21px;
+  font-size: 19px;
+  line-height: 1;
   color: #8f97ab;
   transform: rotate(-2deg);
   white-space: nowrap;
